@@ -32,17 +32,17 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * An abstract class to manage report generation, with many helper methods to ease the job: you just need to
- * implement getTitle() and renderBody().
- *
+ * <p>An abstract class to manage report generation, with many helper methods to ease the job: you just need to
+ * implement getTitle() and renderBody().</p>
+ * 
+ * <p><strong>TODO</strong> Later it may be appropriate to create something like a VelocityMavenReportRenderer
+ * that could take a velocity template and pipe that through Doxia rather than coding them
+ * up like this.</p>
+ * 
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
- * @version $Id$
  * @since 2.0
- * @TODO Later it may be appropriate to create something like a VelocityMavenReportRenderer
- * that could take a velocity template and pipe that through Doxia rather than coding them
- * up like this.
  * @see #getTitle()
  * @see #renderBody()
  */
@@ -66,6 +66,7 @@ public abstract class AbstractMavenReportRenderer
     }
 
     /** {@inheritDoc} */
+    @Override
     public void render()
     {
         sink.head();
@@ -179,7 +180,7 @@ public abstract class AbstractMavenReportRenderer
      * @see Sink#section3_()
      * @see Sink#section4_()
      * @see Sink#section5_()
-     * @IllegalStateException if too many closing sections.
+     * @throws IllegalStateException if too many closing sections.
      */
     protected void endSection()
     {
@@ -291,7 +292,7 @@ public abstract class AbstractMavenReportRenderer
      * <p>If <code>asHtml</code> is true, add the text as Html</p>
      *
      * @param text the text to put in this cell, could be null.
-     * @param asHtml <tt>true</tt> to add the text as Html, <tt>false</tt> otherwise.
+     * @param asHtml {@code true} to add the text as Html, {@code false} otherwise.
      * @see #linkPatternedText(String)
      * @see Sink#tableCell()
      * @see Sink#tableCell_()
@@ -606,7 +607,7 @@ public abstract class AbstractMavenReportRenderer
 
         // Map defined by key/value name/href
         // If href == null, it means
-        List<String> segments = new ArrayList<String>();
+        List<String> segments = new ArrayList<>();
 
         // TODO Special case http://jira.codehaus.org/browse/MEV-40
         if ( text.indexOf( "${" ) != -1 )
@@ -725,7 +726,7 @@ public abstract class AbstractMavenReportRenderer
     // Abstract methods
     // ----------------------------------------------------------------------
 
-    /** {@inheritDoc} */
+    @Override
     public abstract String getTitle();
 
     /**

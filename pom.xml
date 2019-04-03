@@ -23,13 +23,13 @@
   <parent>
     <groupId>org.apache.maven.shared</groupId>
     <artifactId>maven-shared-components</artifactId>
-    <version>30</version>
-    <relativePath>../../pom/maven/maven-shared-components/pom.xml</relativePath>
+    <version>33</version>
+    <relativePath/>
   </parent>
 
   <groupId>org.apache.maven.reporting</groupId>
   <artifactId>maven-reporting-impl</artifactId>
-  <version>3.0.1-SNAPSHOT</version>
+  <version>3.1.0-SNAPSHOT</version>
 
   <name>Apache Maven Reporting Implementation</name>
   <description>Abstract classes to manage report generation.</description>
@@ -71,8 +71,7 @@
     <mavenVersion>3.0</mavenVersion>
     <doxiaVersion>1.7</doxiaVersion>
     <doxiaSitetoolsVersion>1.7.4</doxiaSitetoolsVersion>
-    <maven.compiler.source>1.6</maven.compiler.source>
-    <maven.compiler.target>1.6</maven.compiler.target>
+    <javaVersion>7</javaVersion>
   </properties>
 
   <dependencies>
@@ -158,7 +157,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-invoker-plugin</artifactId>
-        <version>3.0.1</version><!-- TODO remove version when upgrading parent pom -->
         <configuration>
           <debug>true</debug>
           <projectsDirectory>src/it</projectsDirectory>
@@ -173,6 +171,8 @@
           <properties>
             <maven.compiler.source>${maven.compiler.source}</maven.compiler.source>
             <maven.compiler.target>${maven.compiler.target}</maven.compiler.target>
+            <!-- e.g. ensure that Java7 picks up TLSv1.2 when connecting with Central -->
+            <https.protocols>${https.protocols}</https.protocols>
           </properties>
         </configuration>
         <executions>

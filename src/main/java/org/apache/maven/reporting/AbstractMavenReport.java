@@ -33,7 +33,6 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.WriterFactory;
-import org.apache.maven.shared.utils.io.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 
 import java.io.File;
@@ -55,7 +54,6 @@ import java.util.Map;
  * </ul>
  *
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id$
  * @since 2.0
  * @see #execute() <code>Mojo.execute()</code>, from maven-plugin-api
  * @see #generate(Sink, SinkFactory, Locale) <code>MavenMultiPageReport.generate( Sink, SinkFactory, Locale )</code>,
@@ -111,9 +109,9 @@ public abstract class AbstractMavenReport
      * This method is called when the report generation is invoked directly as a standalone Mojo.
      *
      * @throws MojoExecutionException if an error occurs when generating the report
-     * @see org.apache.maven.plugins.site.ReportDocumentRender
      * @see org.apache.maven.plugin.Mojo#execute()
      */
+    @Override
     public void execute()
         throws MojoExecutionException
     {
@@ -122,24 +120,24 @@ public abstract class AbstractMavenReport
             return;
         }
 
-        Writer writer = null;
+        File outputDirectory = new File( getOutputDirectory() );
+
+        String filename = getOutputName() + ".html";
+
+        Locale locale = Locale.getDefault();
+
+        SiteRenderingContext siteContext = new SiteRenderingContext();
+        siteContext.setDecoration( new DecorationModel() );
+        siteContext.setTemplateName( "org/apache/maven/doxia/siterenderer/resources/default-site.vm" );
+        siteContext.setLocale( locale );
+        siteContext.setTemplateProperties( getTemplateProperties() );
+
+        RenderingContext context = new RenderingContext( outputDirectory, filename );
+
+        SiteRendererSink sink = new SiteRendererSink( context );
+
         try
         {
-            File outputDirectory = new File( getOutputDirectory() );
-
-            String filename = getOutputName() + ".html";
-
-            Locale locale = Locale.getDefault();
-
-            SiteRenderingContext siteContext = new SiteRenderingContext();
-            siteContext.setDecoration( new DecorationModel() );
-            siteContext.setTemplateName( "org/apache/maven/doxia/siterenderer/resources/default-site.vm" );
-            siteContext.setLocale( locale );
-            siteContext.setTemplateProperties( getTemplateProperties() );
-
-            RenderingContext context = new RenderingContext( outputDirectory, filename );
-
-            SiteRendererSink sink = new SiteRendererSink( context );
 
             generate( sink, null, locale );
 
@@ -147,34 +145,18 @@ public abstract class AbstractMavenReport
             {
                 outputDirectory.mkdirs();
 
-                writer =
+                try ( Writer writer =
                     new OutputStreamWriter( new FileOutputStream( new File( outputDirectory, filename ) ),
-                                            getOutputEncoding() );
-
-                getSiteRenderer().generateDocument( writer, sink, siteContext );
-
-                //getSiteRenderer().copyResources( siteContext, new File( project.getBasedir(), "src/site/resources" ),
-                //                            outputDirectory );
+                                            getOutputEncoding() ) )
+                {
+                    getSiteRenderer().generateDocument( writer, sink, siteContext );
+                }
             }
         }
-        catch ( RendererException e )
+        catch ( RendererException | IOException | MavenReportException e )
         {
             throw new MojoExecutionException(
                 "An error has occurred in " + getName( Locale.ENGLISH ) + " report generation.", e );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException(
-                "An error has occurred in " + getName( Locale.ENGLISH ) + " report generation.", e );
-        }
-        catch ( MavenReportException e )
-        {
-            throw new MojoExecutionException(
-                "An error has occurred in " + getName( Locale.ENGLISH ) + " report generation.", e );
-        }
-        finally
-        {
-            IOUtil.close( writer );
         }
     }
 
@@ -185,7 +167,7 @@ public abstract class AbstractMavenReport
      */
     private Map<String, Object> getTemplateProperties()
     {
-        Map<String, Object> templateProperties = new HashMap<String, Object>();
+        Map<String, Object> templateProperties = new HashMap<>();
         templateProperties.put( "project", getProject() );
         templateProperties.put( "inputEncoding", getInputEncoding() );
         templateProperties.put( "outputEncoding", getOutputEncoding() );
@@ -205,6 +187,8 @@ public abstract class AbstractMavenReport
      * @throws MavenReportException if any
      * @deprecated use {@link #generate(Sink, SinkFactory, Locale)} instead.
      */
+    @Deprecated
+    @Override
     public void generate( org.codehaus.doxia.sink.Sink sink, Locale locale )
         throws MavenReportException
     {
@@ -217,9 +201,10 @@ public abstract class AbstractMavenReport
      * @param sink
      * @param locale
      * @throws MavenReportException
-     * @see org.apache.maven.reporting.MavenReport#generate(org.apache.maven.doxia.sink.Sink, java.util.Locale)
+     * @see org.apache.maven.reporting.MavenReport#generate(org.codehaus.doxia.sink.Sink, Locale)
      * @deprecated use {@link #generate(Sink, SinkFactory, Locale)} instead.
      */
+    @Deprecated
     public void generate( Sink sink, Locale locale )
         throws MavenReportException
     {
@@ -234,6 +219,7 @@ public abstract class AbstractMavenReport
      * @param locale
      * @throws MavenReportException
      */
+    @Override
     public void generate( Sink sink, SinkFactory sinkFactory, Locale locale )
         throws MavenReportException
     {
@@ -254,15 +240,15 @@ public abstract class AbstractMavenReport
     }
 
     /**
-     * {@inheritDoc}
      * @return CATEGORY_PROJECT_REPORTS
      */
+    @Override
     public String getCategoryName()
     {
         return CATEGORY_PROJECT_REPORTS;
     }
 
-    /** {@inheritDoc} */
+    @Override
     public File getReportOutputDirectory()
     {
         if ( reportOutputDirectory == null )
@@ -273,7 +259,7 @@ public abstract class AbstractMavenReport
         return reportOutputDirectory;
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void setReportOutputDirectory( File reportOutputDirectory )
     {
         this.reportOutputDirectory = reportOutputDirectory;
@@ -341,14 +327,15 @@ public abstract class AbstractMavenReport
 
     /**
      * @see org.apache.maven.reporting.MavenReport#isExternalReport()
-     * @return <tt>false</tt> by default.
+     * @return {@code false} by default.
      */
+    @Override
     public boolean isExternalReport()
     {
         return false;
     }
 
-    /** {@inheritDoc} */
+    @Override
     public boolean canGenerateReport()
     {
         return true;
