@@ -45,15 +45,6 @@ ${project.name}
 
 * History
 
-** Inclusion in Maven core
-
-  Until Maven 2.0.4, <<<maven-reporting-impl>>> was included in Maven 2 core distribution: version
-  used was completely driven by Maven version used.
-  
-  The module was removed from Maven core starting with Maven 2.0.5 and
-  moved to shared components to improve fexibility: starting with Maven 2.0.5, each plugin can choose its
-  <<<maven-reporting-impl>>> version independently from Maven.
-
 ** Doxia runtime
 
   When used as a direct standalone goal invocation, Doxia implementation used is the version used during plugin compilation.
@@ -64,8 +55,6 @@ ${project.name}
   in <<<{{{/shared/maven-reporting-exec/}maven-reporting-exec}}>>>.
 
 ** Doxia dependency
-
-  <<<maven-reporting-impl 2.0.x>>> use Doxia 1.0, then is used for reporting plugins wanting Maven 2.0.x compatibility.
 
   From <<<maven-reporting-impl 2.1>>> to <<<maven-reporting-impl 2.3>>>, Doxia version used ranges from 1.1 to 1.4.
   When creating a reporting plugin using one of these <<<maven-reporting-impl>>> versions,
