@@ -132,8 +132,7 @@ public abstract class AbstractMavenReport
         siteContext.setLocale( locale );
         siteContext.setTemplateProperties( getTemplateProperties() );
 
-        // TODO Replace null with real value
-        RenderingContext context = new RenderingContext( outputDirectory, filename, null );
+        RenderingContext context = new RenderingContext( outputDirectory, filename );
 
         SiteRendererSink sink = new SiteRendererSink( context );
 
@@ -150,7 +149,7 @@ public abstract class AbstractMavenReport
                     new OutputStreamWriter( new FileOutputStream( new File( outputDirectory, filename ) ),
                                             getOutputEncoding() ) )
                 {
-                    getSiteRenderer().mergeDocumentIntoSite( writer, sink, siteContext );
+                    getSiteRenderer().generateDocument( writer, sink, siteContext );
                 }
             }
         }
@@ -178,6 +177,22 @@ public abstract class AbstractMavenReport
             templateProperties.put( (String) entry.getKey(), entry.getValue() );
         }
         return templateProperties;
+    }
+
+    /**
+     * Generate a report.
+     *
+     * @param sink the sink to use for the generation.
+     * @param locale the wanted locale to generate the report, could be null.
+     * @throws MavenReportException if any
+     * @deprecated use {@link #generate(Sink, SinkFactory, Locale)} instead.
+     */
+    @Deprecated
+    @Override
+    public void generate( org.codehaus.doxia.sink.Sink sink, Locale locale )
+        throws MavenReportException
+    {
+        generate( sink, null, locale );
     }
 
     /**

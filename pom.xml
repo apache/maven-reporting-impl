@@ -69,8 +69,8 @@
 
   <properties>
     <mavenVersion>3.1.0</mavenVersion>
-    <doxiaVersion>2.0.0-M1</doxiaVersion>
-    <doxiaSitetoolsVersion>2.0.0-M1-SNAPSHOT</doxiaSitetoolsVersion>
+    <doxiaVersion>1.7</doxiaVersion>
+    <doxiaSitetoolsVersion>1.7.4</doxiaSitetoolsVersion>
     <javaVersion>7</javaVersion>
     <project.build.outputTimestamp>2020-04-04T09:03:59Z</project.build.outputTimestamp>
   </properties>
@@ -79,7 +79,7 @@
     <dependency>
       <groupId>org.apache.maven.reporting</groupId>
       <artifactId>maven-reporting-api</artifactId>
-      <version>3.1.0-SNAPSHOT</version>
+      <version>3.0</version>
     </dependency>
 
     <!-- Maven -->
