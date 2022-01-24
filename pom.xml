@@ -69,8 +69,8 @@
 
   <properties>
     <mavenVersion>3.1.0</mavenVersion>
-    <doxiaVersion>1.7</doxiaVersion>
-    <doxiaSitetoolsVersion>1.7.4</doxiaSitetoolsVersion>
+    <doxiaVersion>1.11.1</doxiaVersion>
+    <doxiaSitetoolsVersion>1.11.1</doxiaSitetoolsVersion>
     <javaVersion>7</javaVersion>
     <project.build.outputTimestamp>2020-04-04T09:03:59Z</project.build.outputTimestamp>
   </properties>
@@ -119,11 +119,6 @@
       <groupId>org.apache.maven.doxia</groupId>
       <artifactId>doxia-site-renderer</artifactId>
       <version>${doxiaSitetoolsVersion}</version>
-    </dependency>
-    <dependency><!-- TODO remove dependency when upgrading Doxia Sitetools to 1.7.5 -->
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <version>2.6</version>
     </dependency>
 
     <!-- misc -->

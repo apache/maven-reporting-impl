@@ -132,7 +132,8 @@ public abstract class AbstractMavenReport
         siteContext.setLocale( locale );
         siteContext.setTemplateProperties( getTemplateProperties() );
 
-        RenderingContext context = new RenderingContext( outputDirectory, filename );
+        // TODO Replace null with real value
+        RenderingContext context = new RenderingContext( outputDirectory, filename, null );
 
         SiteRendererSink sink = new SiteRendererSink( context );
 
@@ -149,7 +150,7 @@ public abstract class AbstractMavenReport
                     new OutputStreamWriter( new FileOutputStream( new File( outputDirectory, filename ) ),
                                             getOutputEncoding() ) )
                 {
-                    getSiteRenderer().generateDocument( writer, sink, siteContext );
+                    getSiteRenderer().mergeDocumentIntoSite( writer, sink, siteContext );
                 }
             }
         }

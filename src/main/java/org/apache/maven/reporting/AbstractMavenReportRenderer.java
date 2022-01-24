@@ -20,6 +20,7 @@ package org.apache.maven.reporting;
  */
 
 import org.apache.maven.doxia.sink.Sink;
+import org.apache.maven.doxia.sink.impl.SinkEventAttributeSet;
 import org.apache.maven.doxia.util.HtmlTools;
 
 import org.apache.maven.shared.utils.StringUtils;
@@ -34,11 +35,11 @@ import java.util.Properties;
 /**
  * <p>An abstract class to manage report generation, with many helper methods to ease the job: you just need to
  * implement getTitle() and renderBody().</p>
- * 
+ *
  * <p><strong>TODO</strong> Later it may be appropriate to create something like a VelocityMavenReportRenderer
  * that could take a velocity template and pipe that through Doxia rather than coding them
  * up like this.</p>
- * 
+ *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
@@ -446,7 +447,7 @@ public abstract class AbstractMavenReportRenderer
      */
     protected void verbatimText( String text )
     {
-        sink.verbatim( true );
+        sink.verbatim( SinkEventAttributeSet.BOXED );
 
         text( text );
 
@@ -471,7 +472,7 @@ public abstract class AbstractMavenReportRenderer
         }
         else
         {
-            sink.verbatim( true );
+            sink.verbatim( SinkEventAttributeSet.BOXED );
 
             link( href, text );
 
