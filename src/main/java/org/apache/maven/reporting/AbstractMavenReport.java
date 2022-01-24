@@ -189,7 +189,6 @@ public abstract class AbstractMavenReport
      * @deprecated use {@link #generate(Sink, SinkFactory, Locale)} instead.
      */
     @Deprecated
-    @Override
     public void generate( org.codehaus.doxia.sink.Sink sink, Locale locale )
         throws MavenReportException
     {
@@ -202,10 +201,10 @@ public abstract class AbstractMavenReport
      * @param sink
      * @param locale
      * @throws MavenReportException
-     * @see org.apache.maven.reporting.MavenReport#generate(org.codehaus.doxia.sink.Sink, Locale)
      * @deprecated use {@link #generate(Sink, SinkFactory, Locale)} instead.
      */
     @Deprecated
+    @Override
     public void generate( Sink sink, Locale locale )
         throws MavenReportException
     {
