@@ -441,12 +441,12 @@ public abstract class AbstractMavenReportRenderer
      *
      * @param text a text, could be null.
      * @see #text(String)
-     * @see Sink#verbatim(boolean)
+     * @see Sink#verbatim()
      * @see Sink#verbatim_()
      */
     protected void verbatimText( String text )
     {
-        sink.verbatim( true );
+        sink.verbatim( null );
 
         text( text );
 
@@ -460,7 +460,7 @@ public abstract class AbstractMavenReportRenderer
      * @param href an href could be null
      * @see #link(String, String)
      * @see #verbatimText(String)
-     * @see Sink#verbatim(boolean)
+     * @see Sink#verbatim()
      * @see Sink#verbatim_()
      */
     protected void verbatimLink( String text, String href )
@@ -471,7 +471,7 @@ public abstract class AbstractMavenReportRenderer
         }
         else
         {
-            sink.verbatim( true );
+            sink.verbatim( null );
 
             link( href, text );
 
