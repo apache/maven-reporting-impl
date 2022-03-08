@@ -19,6 +19,10 @@ package org.apache.maven.reporting;
  * under the License.
  */
 
+import org.apache.maven.api.Project;
+import org.apache.maven.api.plugin.MojoException;
+import org.apache.maven.api.plugin.annotations.Component;
+import org.apache.maven.api.plugin.annotations.Parameter;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.SinkFactory;
 import org.apache.maven.doxia.site.decoration.DecorationModel;
@@ -27,13 +31,10 @@ import org.apache.maven.doxia.siterenderer.RendererException;
 import org.apache.maven.doxia.siterenderer.RenderingContext;
 import org.apache.maven.doxia.siterenderer.SiteRenderingContext;
 import org.apache.maven.doxia.siterenderer.sink.SiteRendererSink;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Component;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.WriterFactory;
 import org.codehaus.plexus.util.ReaderFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -61,9 +62,10 @@ import java.util.Map;
  * @see #executeReport(Locale) <code>abstract executeReport( Locale )</code>
  */
 public abstract class AbstractMavenReport
-    extends AbstractMojo
-    implements MavenMultiPageReport
+    implements org.apache.maven.api.plugin.Mojo, MavenMultiPageReport
 {
+    protected final Logger logger = LoggerFactory.getLogger( getClass() );
+
     /**
      * The output directory for the report. Note that this parameter is only evaluated if the goal is run directly from
      * the command line. If the goal is run indirectly as part of a site generation, the output directory configured in
@@ -76,7 +78,7 @@ public abstract class AbstractMavenReport
      * The Maven Project.
      */
     @Parameter( defaultValue = "${project}", readonly = true, required = true )
-    protected MavenProject project;
+    protected Project project;
 
     /**
      * Specifies the input encoding.
@@ -108,12 +110,12 @@ public abstract class AbstractMavenReport
     /**
      * This method is called when the report generation is invoked directly as a standalone Mojo.
      *
-     * @throws MojoExecutionException if an error occurs when generating the report
-     * @see org.apache.maven.plugin.Mojo#execute()
+     * @throws MojoException if an error occurs when generating the report
+     * @see org.apache.maven.api.plugin.Mojo#execute()
      */
     @Override
     public void execute()
-        throws MojoExecutionException
+        throws MojoException
     {
         if ( !canGenerateReport() )
         {
@@ -155,7 +157,7 @@ public abstract class AbstractMavenReport
         }
         catch ( RendererException | IOException | MavenReportException e )
         {
-            throw new MojoExecutionException(
+            throw new MojoException(
                 "An error has occurred in " + getName( Locale.ENGLISH ) + " report generation.", e );
         }
     }
@@ -172,7 +174,7 @@ public abstract class AbstractMavenReport
         templateProperties.put( "inputEncoding", getInputEncoding() );
         templateProperties.put( "outputEncoding", getOutputEncoding() );
         // Put any of the properties in directly into the Velocity context
-        for ( Map.Entry<Object, Object> entry : getProject().getProperties().entrySet() )
+        for ( Map.Entry<Object, Object> entry : getProject().getModel().getProperties().entrySet() )
         {
             templateProperties.put( (String) entry.getKey(), entry.getValue() );
         }
@@ -208,7 +210,7 @@ public abstract class AbstractMavenReport
     {
         if ( !canGenerateReport() )
         {
-            getLog().info( "This report cannot be generated as part of the current build. "
+            logger.info( "This report cannot be generated as part of the current build. "
                            + "The report name should be referenced in this line of output." );
             return;
         }
@@ -254,7 +256,7 @@ public abstract class AbstractMavenReport
         return outputDirectory.getAbsolutePath();
     }
 
-    protected MavenProject getProject()
+    protected Project getProject()
     {
         return project;
     }
