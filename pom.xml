@@ -68,10 +68,10 @@
   </distributionManagement>
 
   <properties>
+    <javaVersion>8</javaVersion>
     <mavenVersion>3.2.5</mavenVersion>
     <doxiaVersion>1.11.1</doxiaVersion>
     <doxiaSitetoolsVersion>1.11.1</doxiaSitetoolsVersion>
-    <javaVersion>7</javaVersion>
     <project.build.outputTimestamp>2022-02-05T21:36:19Z</project.build.outputTimestamp>
   </properties>
 
@@ -167,8 +167,6 @@
           <properties>
             <maven.compiler.source>${maven.compiler.source}</maven.compiler.source>
             <maven.compiler.target>${maven.compiler.target}</maven.compiler.target>
-            <!-- e.g. ensure that Java7 picks up TLSv1.2 when connecting with Central -->
-            <https.protocols>${https.protocols}</https.protocols>
           </properties>
         </configuration>
         <executions>
