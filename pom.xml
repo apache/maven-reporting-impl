@@ -68,7 +68,7 @@
   </distributionManagement>
 
   <properties>
-    <mavenVersion>3.1.0</mavenVersion>
+    <mavenVersion>3.2.5</mavenVersion>
     <doxiaVersion>1.11.1</doxiaVersion>
     <doxiaSitetoolsVersion>1.11.1</doxiaSitetoolsVersion>
     <javaVersion>7</javaVersion>
