@@ -70,8 +70,8 @@
   <properties>
     <javaVersion>8</javaVersion>
     <mavenVersion>3.2.5</mavenVersion>
-    <doxiaVersion>1.11.1</doxiaVersion>
-    <doxiaSitetoolsVersion>1.11.1</doxiaSitetoolsVersion>
+    <doxiaVersion>2.0.0-M2</doxiaVersion>
+    <doxiaSitetoolsVersion>2.0.0-M2</doxiaSitetoolsVersion>
     <project.build.outputTimestamp>2022-02-05T21:36:19Z</project.build.outputTimestamp>
   </properties>
 
