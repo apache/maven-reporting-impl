@@ -95,6 +95,7 @@ public abstract class AbstractMavenReportRenderer
      * Convenience method to wrap section creation in the current sink. An anchor will be add for the name.
      *
      * @param name the name of this section, could be null.
+     * @param anchor the anchor of this section, could be null.
      * @see #text(String)
      * @see Sink#section1()
      * @see Sink#sectionTitle1()
@@ -113,6 +114,33 @@ public abstract class AbstractMavenReportRenderer
      * @see Sink#sectionTitle5_()
      */
     protected void startSection( String name )
+    {
+        startSection( name, name );
+    }
+
+    /**
+     * Convenience method to wrap section creation in the current sink. An anchor will be add for the name.
+     *
+     * @param name the name of this section, could be null.
+     * @param anchor the anchor of this section, could be null.
+     * @see #text(String)
+     * @see Sink#section1()
+     * @see Sink#sectionTitle1()
+     * @see Sink#sectionTitle1_()
+     * @see Sink#section2()
+     * @see Sink#sectionTitle2()
+     * @see Sink#sectionTitle2_()
+     * @see Sink#section3()
+     * @see Sink#sectionTitle3()
+     * @see Sink#sectionTitle3_()
+     * @see Sink#section4()
+     * @see Sink#sectionTitle4()
+     * @see Sink#sectionTitle4_()
+     * @see Sink#section5()
+     * @see Sink#sectionTitle5()
+     * @see Sink#sectionTitle5_()
+     */
+    protected void startSection( String name, String anchor )
     {
         section = section + 1;
 
@@ -169,7 +197,7 @@ public abstract class AbstractMavenReportRenderer
                 break;
         }
 
-        sink.anchor( HtmlTools.encodeId( name ) );
+        sink.anchor( HtmlTools.encodeId( anchor ) );
         sink.anchor_();
     }
 
