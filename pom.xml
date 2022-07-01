@@ -72,6 +72,7 @@
     <mavenVersion>3.2.5</mavenVersion>
     <doxiaVersion>2.0.0-M3</doxiaVersion>
     <doxiaSitetoolsVersion>2.0.0-M3</doxiaSitetoolsVersion>
+    <reportingApiVersion>4.0.0-M1</reportingApiVersion>
     <project.build.outputTimestamp>2022-04-20T18:18:05Z</project.build.outputTimestamp>
   </properties>
 
@@ -79,7 +80,7 @@
     <dependency>
       <groupId>org.apache.maven.reporting</groupId>
       <artifactId>maven-reporting-api</artifactId>
-      <version>4.0.0-M1</version>
+      <version>${reportingApiVersion}</version>
     </dependency>
 
     <!-- Maven -->
@@ -130,14 +131,14 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>3.3.1</version>
+      <version>3.4.2</version>
     </dependency>
 
     <!-- test -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.1</version>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
