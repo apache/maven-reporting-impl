@@ -442,7 +442,7 @@ public abstract class AbstractMavenReportRenderer
      *
      * @param text a text, could be null.
      * @see #text(String)
-     * @see Sink#verbatim(boolean)
+     * @see Sink#verbatim(org.apache.maven.doxia.sink.SinkEventAttributes)
      * @see Sink#verbatim_()
      */
     protected void verbatimText( String text )
@@ -461,7 +461,7 @@ public abstract class AbstractMavenReportRenderer
      * @param href an href could be null
      * @see #link(String, String)
      * @see #verbatimText(String)
-     * @see Sink#verbatim(boolean)
+     * @see Sink#verbatim(org.apache.maven.doxia.sink.SinkEventAttributes)
      * @see Sink#verbatim_()
      */
     protected void verbatimLink( String text, String href )
