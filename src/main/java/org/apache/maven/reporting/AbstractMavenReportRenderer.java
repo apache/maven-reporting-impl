@@ -92,10 +92,10 @@ public abstract class AbstractMavenReportRenderer
     // ----------------------------------------------------------------------
 
     /**
-     * Convenience method to wrap section creation in the current sink. An anchor will be add for the name.
+     * Convenience method to wrap section creation in the current sink.
+     * An anchor will be derived from the name.
      *
      * @param name the name of this section, could be null.
-     * @param anchor the anchor of this section, could be null.
      * @see #text(String)
      * @see Sink#section1()
      * @see Sink#sectionTitle1()
@@ -119,7 +119,7 @@ public abstract class AbstractMavenReportRenderer
     }
 
     /**
-     * Convenience method to wrap section creation in the current sink. An anchor will be add for the name.
+     * Convenience method to wrap section creation in the current sink.
      *
      * @param name the name of this section, could be null.
      * @param anchor the anchor of this section, could be null.
