@@ -21,7 +21,6 @@ package org.apache.maven.reporting;
 
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.impl.SinkEventAttributeSet;
-import org.apache.maven.doxia.util.HtmlTools;
 
 import org.apache.maven.shared.utils.StringUtils;
 
@@ -97,21 +96,9 @@ public abstract class AbstractMavenReportRenderer
      *
      * @param name the name of this section, could be null.
      * @see #text(String)
-     * @see Sink#section1()
-     * @see Sink#sectionTitle1()
-     * @see Sink#sectionTitle1_()
-     * @see Sink#section2()
-     * @see Sink#sectionTitle2()
-     * @see Sink#sectionTitle2_()
-     * @see Sink#section3()
-     * @see Sink#sectionTitle3()
-     * @see Sink#sectionTitle3_()
-     * @see Sink#section4()
-     * @see Sink#sectionTitle4()
-     * @see Sink#sectionTitle4_()
-     * @see Sink#section5()
-     * @see Sink#sectionTitle5()
-     * @see Sink#sectionTitle5_()
+     * @see Sink#section(int, org.apache.maven.doxia.sink.SinkEventAttributes)
+     * @see Sink#sectionTitle(int, org.apache.maven.doxia.sink.SinkEventAttributes)
+     * @see Sink#sectionTitle_(int)
      */
     protected void startSection( String name )
     {
@@ -124,119 +111,31 @@ public abstract class AbstractMavenReportRenderer
      * @param name the name of this section, could be null.
      * @param anchor the anchor of this section, could be null.
      * @see #text(String)
-     * @see Sink#section1()
-     * @see Sink#sectionTitle1()
-     * @see Sink#sectionTitle1_()
-     * @see Sink#section2()
-     * @see Sink#sectionTitle2()
-     * @see Sink#sectionTitle2_()
-     * @see Sink#section3()
-     * @see Sink#sectionTitle3()
-     * @see Sink#sectionTitle3_()
-     * @see Sink#section4()
-     * @see Sink#sectionTitle4()
-     * @see Sink#sectionTitle4_()
-     * @see Sink#section5()
-     * @see Sink#sectionTitle5()
-     * @see Sink#sectionTitle5_()
+     * @see Sink#section(int, org.apache.maven.doxia.sink.SinkEventAttributes)
+     * @see Sink#sectionTitle(int, org.apache.maven.doxia.sink.SinkEventAttributes)
+     * @see Sink#sectionTitle_(int)
      */
     protected void startSection( String name, String anchor )
     {
-        section = section + 1;
-
-        switch ( section )
-        {
-            case 1:
-                sink.section1();
-                sink.sectionTitle1();
-                break;
-            case 2:
-                sink.section2();
-                sink.sectionTitle2();
-                break;
-            case 3:
-                sink.section3();
-                sink.sectionTitle3();
-                break;
-            case 4:
-                sink.section4();
-                sink.sectionTitle4();
-                break;
-            case 5:
-                sink.section5();
-                sink.sectionTitle5();
-                break;
-
-            default:
-                // TODO: warning - just don't start a section
-                break;
-        }
-
+        section++;
+        sink.section( section, null );
+        sink.sectionTitle( section, null );
+        sink.anchor( anchor );
         text( name );
-
-        switch ( section )
-        {
-            case 1:
-                sink.sectionTitle1_();
-                break;
-            case 2:
-                sink.sectionTitle2_();
-                break;
-            case 3:
-                sink.sectionTitle3_();
-                break;
-            case 4:
-                sink.sectionTitle4_();
-                break;
-            case 5:
-                sink.sectionTitle5_();
-                break;
-
-            default:
-                // TODO: warning - just don't start a section
-                break;
-        }
-
-        sink.anchor( HtmlTools.encodeId( anchor ) );
         sink.anchor_();
+        sink.sectionTitle_( section );
     }
 
     /**
      * Convenience method to wrap section ending in the current sink.
      *
-     * @see Sink#section1_()
-     * @see Sink#section2_()
-     * @see Sink#section3_()
-     * @see Sink#section4_()
-     * @see Sink#section5_()
+     * @see Sink#section_()
      * @throws IllegalStateException if too many closing sections.
      */
     protected void endSection()
     {
-        switch ( section )
-        {
-            case 1:
-                sink.section1_();
-                break;
-            case 2:
-                sink.section2_();
-                break;
-            case 3:
-                sink.section3_();
-                break;
-            case 4:
-                sink.section4_();
-                break;
-            case 5:
-                sink.section5_();
-                break;
-
-            default:
-                // TODO: warning - just don't start a section
-                break;
-        }
-
-        section = section - 1;
+        sink.section_( section );
+        section--;
 
         if ( section < 0 )
         {
