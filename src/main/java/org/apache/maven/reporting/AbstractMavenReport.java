@@ -19,6 +19,8 @@ package org.apache.maven.reporting;
  * under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.SinkFactory;
 import org.apache.maven.doxia.site.decoration.DecorationModel;
@@ -27,6 +29,8 @@ import org.apache.maven.doxia.siterenderer.RendererException;
 import org.apache.maven.doxia.siterenderer.RenderingContext;
 import org.apache.maven.doxia.siterenderer.SiteRenderingContext;
 import org.apache.maven.doxia.siterenderer.sink.SiteRendererSink;
+import org.apache.maven.doxia.tools.SiteTool;
+import org.apache.maven.doxia.tools.SiteToolException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
@@ -35,12 +39,15 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.WriterFactory;
 import org.codehaus.plexus.util.ReaderFactory;
 
+import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -91,6 +98,24 @@ public abstract class AbstractMavenReport
     private String outputEncoding;
 
     /**
+     * The local repository.
+     */
+    @Parameter( defaultValue = "${localRepository}", readonly = true, required = true )
+    protected ArtifactRepository localRepository;
+
+    /**
+     * Remote repositories used for the project.
+     */
+    @Parameter( defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true )
+    protected List<ArtifactRepository> remoteRepositories;
+
+    /**
+     * SiteTool.
+     */
+    @Component
+    protected SiteTool siteTool;
+
+    /**
      * Doxia Site Renderer component.
      */
     @Component
@@ -126,19 +151,17 @@ public abstract class AbstractMavenReport
 
         Locale locale = Locale.getDefault();
 
-        SiteRenderingContext siteContext = new SiteRenderingContext();
-        siteContext.setDecoration( new DecorationModel() );
-        siteContext.setTemplateName( "org/apache/maven/doxia/siterenderer/resources/default-site.vm" );
-        siteContext.setLocale( locale );
-        siteContext.setTemplateProperties( getTemplateProperties() );
-
-        // TODO Replace null with real value
-        RenderingContext context = new RenderingContext( outputDirectory, filename, null );
-
-        SiteRendererSink sink = new SiteRendererSink( context );
-
         try
         {
+            SiteRenderingContext siteContext = createSiteRenderingContext( locale );
+
+            // copy resources
+            getSiteRenderer().copyResources( siteContext, outputDirectory );
+
+            // TODO Replace null with real value
+            RenderingContext docRenderingContext = new RenderingContext( outputDirectory, filename, null );
+
+            SiteRendererSink sink = new SiteRendererSink( docRenderingContext );
 
             generate( sink, null, locale );
 
@@ -147,12 +170,16 @@ public abstract class AbstractMavenReport
                 outputDirectory.mkdirs();
 
                 try ( Writer writer =
-                    new OutputStreamWriter( new FileOutputStream( new File( outputDirectory, filename ) ),
-                                            getOutputEncoding() ) )
+                      new OutputStreamWriter( new FileOutputStream( new File( outputDirectory, filename ) ),
+                                              getOutputEncoding() ) )
                 {
+                    // render report
                     getSiteRenderer().mergeDocumentIntoSite( writer, sink, siteContext );
                 }
             }
+
+            // copy generated resources also
+            getSiteRenderer().copyResources( siteContext, outputDirectory );
         }
         catch ( RendererException | IOException | MavenReportException e )
         {
@@ -161,14 +188,14 @@ public abstract class AbstractMavenReport
         }
     }
 
-    /**
-     * create template properties like done in maven-site-plugin's
-     * <code>AbstractSiteRenderingMojo.createSiteRenderingContext( Locale )</code>
-     * @return properties
-     */
-    private Map<String, Object> getTemplateProperties()
+    private SiteRenderingContext createSiteRenderingContext( Locale locale )
+        throws MavenReportException, IOException
     {
+        DecorationModel decorationModel = new DecorationModel();
+
         Map<String, Object> templateProperties = new HashMap<>();
+        // We tell the skin that we are rendering in standalone mode
+        templateProperties.put( "standalone", Boolean.TRUE );
         templateProperties.put( "project", getProject() );
         templateProperties.put( "inputEncoding", getInputEncoding() );
         templateProperties.put( "outputEncoding", getOutputEncoding() );
@@ -177,7 +204,32 @@ public abstract class AbstractMavenReport
         {
             templateProperties.put( (String) entry.getKey(), entry.getValue() );
         }
-        return templateProperties;
+
+        SiteRenderingContext context;
+        try
+        {
+           Artifact skinArtifact =
+               siteTool.getSkinArtifactFromRepository( localRepository, remoteRepositories, decorationModel );
+
+           getLog().info( buffer().a( "Rendering content with " ).strong( skinArtifact.getId()
+               + " skin" ).a( '.' ).toString() );
+
+            context = siteRenderer.createContextForSkin( skinArtifact, templateProperties, decorationModel,
+                                                         project.getName(), locale );
+        }
+        catch ( SiteToolException e )
+        {
+            throw new MavenReportException( "Failed to retrieve skin artifact", e );
+        }
+        catch ( RendererException e )
+        {
+            throw new MavenReportException( "Failed to create context for skin", e );
+        }
+
+        // Generate static site
+        context.setRootDirectory( project.getBasedir() );
+
+        return context;
     }
 
     /**
