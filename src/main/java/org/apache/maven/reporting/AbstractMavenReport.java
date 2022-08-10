@@ -174,7 +174,7 @@ public abstract class AbstractMavenReport
             SiteRenderingContext siteContext = createSiteRenderingContext( locale );
 
             // copy resources
-            siteRenderer.copyResources( siteContext, outputDirectory );
+            getSiteRenderer().copyResources( siteContext, outputDirectory );
 
             // TODO Replace null with real value
             RenderingContext docRenderingContext = new RenderingContext( outputDirectory, filename, null );
@@ -197,7 +197,7 @@ public abstract class AbstractMavenReport
             }
 
             // copy generated resources also
-            siteRenderer.copyResources( siteContext, outputDirectory );
+            getSiteRenderer().copyResources( siteContext, outputDirectory );
         }
         catch ( RendererException | IOException | MavenReportException e )
         {
@@ -227,11 +227,11 @@ public abstract class AbstractMavenReport
         SiteRenderingContext context;
         try
         {
-           Artifact skinArtifact =
-               siteTool.getSkinArtifactFromRepository( localRepository, remoteRepositories, decorationModel );
+            Artifact skinArtifact =
+                siteTool.getSkinArtifactFromRepository( localRepository, remoteRepositories, decorationModel );
 
-           getLog().info( buffer().a( "Rendering content with " ).strong( skinArtifact.getId()
-               + " skin" ).a( '.' ).toString() );
+            getLog().info( buffer().a( "Rendering content with " ).strong( skinArtifact.getId()
+                + " skin" ).a( '.' ).toString() );
 
             context = siteRenderer.createContextForSkin( skinArtifact, templateProperties, decorationModel,
                                                          project.getName(), locale );
@@ -254,9 +254,9 @@ public abstract class AbstractMavenReport
     /**
      * Generate a report.
      *
-     * @param sink
-     * @param locale
-     * @throws MavenReportException
+     * @param sink the sink to use for the generation.
+     * @param locale the wanted locale to generate the report, could be null.
+     * @throws MavenReportException if any
      * @deprecated use {@link #generate(Sink, SinkFactory, Locale)} instead.
      */
     @Deprecated
