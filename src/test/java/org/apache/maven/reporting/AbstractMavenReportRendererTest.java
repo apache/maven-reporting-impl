@@ -19,37 +19,46 @@ package org.apache.maven.reporting;
  * under the License.
  */
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-import junitx.util.PrivateAccessor;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test case for some public method in AbstractMavenReportRenderer.
  */
 public class AbstractMavenReportRendererTest
-    extends TestCase
 {
     private static List<String> applyPattern( String pattern )
         throws Throwable
     {
-        return (List<String>) PrivateAccessor.invoke( AbstractMavenReportRenderer.class, "applyPattern",
-                                              new Class[] { String.class }, new Object[] { pattern } );
+        try
+        {
+            Method method = AbstractMavenReportRenderer.class.getDeclaredMethod( "applyPattern", String.class );
+            method.setAccessible( true );
+            return (List<String>) method.invoke( null, pattern );
+        } catch ( InvocationTargetException ite )
+        {
+            throw ite.getTargetException();
+        }
     }
 
     private static void checkPattern( String pattern, String[] expectedResult ) throws Throwable
     {
         List<String> result = applyPattern( pattern );
-        Assert.assertEquals( "result size", expectedResult.length, result.size() );
+        assertEquals( expectedResult.length, result.size(), "result size" );
         int i = 0;
         for ( Iterator<String> it = result.iterator(); it.hasNext(); )
         {
             String name = it.next();
             String href = it.next();
-            Assert.assertEquals( expectedResult[i], name );
-            Assert.assertEquals( expectedResult[i + 1], href );
+            assertEquals( expectedResult[i], name );
+            assertEquals( expectedResult[i + 1], href );
             i += 2;
         }
     }
@@ -59,7 +68,7 @@ public class AbstractMavenReportRendererTest
         try
         {
             applyPattern( pattern );
-            Assert.fail( cause + " should throw an IllegalArgumentException" );
+            fail( cause + " should throw an IllegalArgumentException" );
         }
         catch ( IllegalArgumentException iae )
         {
@@ -70,6 +79,7 @@ public class AbstractMavenReportRendererTest
     /**
      * @throws Throwable if any
      */
+    @Test
     public void testApplyPattern() throws Throwable
     {
         // the most simple test
