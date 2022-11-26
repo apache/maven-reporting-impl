@@ -72,7 +72,7 @@
     <mavenVersion>3.2.5</mavenVersion>
     <doxiaVersion>2.0.0-M3</doxiaVersion>
     <doxiaSitetoolsVersion>2.0.0-M3</doxiaSitetoolsVersion>
-    <reportingApiVersion>4.0.0-M2</reportingApiVersion>
+    <reportingApiVersion>4.0.0-M3</reportingApiVersion>
     <project.build.outputTimestamp>2022-07-06T20:03:31Z</project.build.outputTimestamp>
   </properties>
 
