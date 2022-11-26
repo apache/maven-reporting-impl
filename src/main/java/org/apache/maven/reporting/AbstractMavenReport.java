@@ -128,6 +128,17 @@ public abstract class AbstractMavenReport
     protected Skin skin;
 
     /**
+     * The locale to use  when the report generation is invoked directly as a standalone Mojo.
+     * <p>
+     * <b>Default value is</b>: {@link SiteTool#DEFAULT_LOCALE}
+     *
+     * @see SiteTool#getSiteLocales(String)
+     */
+
+    @Parameter( defaultValue = "default" )
+    protected String locale;
+
+    /**
      * SiteTool.
      */
     @Component
@@ -167,7 +178,7 @@ public abstract class AbstractMavenReport
 
         String filename = getOutputName() + ".html";
 
-        Locale locale = Locale.getDefault();
+        Locale locale = getLocale();
 
         try
         {
@@ -376,6 +387,16 @@ public abstract class AbstractMavenReport
         {
             return skin;
         }
+    }
+
+    /**
+     * Gets the locale
+     *
+     * @return the locale for this standalone report
+     */
+    protected Locale getLocale()
+    {
+        return siteTool.getSiteLocales( locale ).get( 0 );
     }
 
     /**
