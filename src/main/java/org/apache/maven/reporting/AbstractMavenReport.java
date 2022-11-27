@@ -38,6 +38,12 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.WriterFactory;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.ReaderFactory;
 
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
@@ -70,7 +76,7 @@ import java.util.Map;
  */
 public abstract class AbstractMavenReport
     extends AbstractMojo
-    implements MavenMultiPageReport
+    implements MavenMultiPageReport, Contextualizable
 {
     /**
      * The output directory for the report. Note that this parameter is only evaluated if the goal is run directly from
@@ -149,6 +155,14 @@ public abstract class AbstractMavenReport
     private File reportOutputDirectory;
 
     /**
+     * The output format: null by default, to represent a site, but can be configured to a Doxia sink.
+     */
+    @Parameter( property = "output.format" )
+    protected String outputFormat;
+
+    private PlexusContainer container;
+
+    /**
      * This method is called when the report generation is invoked directly as a standalone Mojo.
      *
      * @throws MojoExecutionException if an error occurs when generating the report
@@ -163,6 +177,61 @@ public abstract class AbstractMavenReport
             return;
         }
 
+        if ( outputFormat != null )
+        {
+            reportToMarkup();
+        }
+        else
+        {
+            reportToSite();
+        }
+    }
+
+    private void reportToMarkup()
+        throws MojoExecutionException
+    {
+        getLog().info( "rendering to " + outputFormat + " markup" );
+
+        if ( !isExternalReport() )
+        {
+            try
+            {
+                sinkFactory = container.lookup( SinkFactory.class, outputFormat );
+                sink = sinkFactory.createSink( outputDirectory, getOutputName() + '.' + outputFormat );
+            }
+            catch ( ComponentLookupException cle )
+            {
+                throw new MojoExecutionException(
+                    "Cannot find SinkFactory for Doxia output format: " + outputFormat, cle );
+            }
+            catch ( IOException ioe )
+            {
+                throw new MojoExecutionException( "Cannot create sink to " + outputDirectory, ioe );
+            }
+        }
+
+        try
+        {
+            Locale locale = Locale.getDefault();
+            generate( sink, sinkFactory, locale );
+        }
+        catch ( MavenReportException mre )
+        {
+            throw new MojoExecutionException(
+                    "An error has occurred in " + getName( Locale.ENGLISH ) + " report generation.", mre );
+        }
+        finally
+        {
+            if ( sink != null )
+            {
+                sink.close();
+            }
+        }
+    }
+
+    private void reportToSite()
+        throws MojoExecutionException
+    {
         File outputDirectory = new File( getOutputDirectory() );
 
         String filename = getOutputName() + ".html";
@@ -383,7 +452,10 @@ public abstract class AbstractMavenReport
      */
     protected void closeReport()
     {
-        getSink().close();
+        if ( getSink() != null )
+        {
+            getSink().close();
+        }
     }
 
     /**
@@ -426,4 +498,13 @@ public abstract class AbstractMavenReport
      */
     protected abstract void executeReport( Locale locale )
         throws MavenReportException;
+
+    /**
+     * {@inheritDoc}
+     */
+    public void contextualize( Context context )
+        throws ContextException
+    {
+        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+    }
 }
