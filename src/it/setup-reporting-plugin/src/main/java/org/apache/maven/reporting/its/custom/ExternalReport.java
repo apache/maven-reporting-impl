@@ -85,6 +85,8 @@ public class ExternalReport
     private void executeExternalTool( String destination )
         throws IOException
     {
+        getLog().info( "Running external tool to " + destination );
+
         // demo implementation, to be replaced with effective tool
         File dest = new File( destination );
 

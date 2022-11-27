@@ -48,6 +48,8 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.WriterFactory;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.ReaderFactory;
 
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
@@ -151,6 +153,15 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     private File reportOutputDirectory;
 
     /**
+     * The report output format: null by default, to represent a site, but can be configured to a Doxia Sink id.
+     */
+    @Parameter(property = "output.format")
+    protected String outputFormat;
+
+    @Component
+    private PlexusContainer container;
+
+    /**
      * This method is called when the report generation is invoked directly as a standalone Mojo.
      *
      * @throws MojoExecutionException if an error occurs when generating the report
@@ -162,6 +173,43 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
             return;
         }
 
+        if (outputFormat != null) {
+            reportToMarkup();
+        } else {
+            reportToSite();
+        }
+    }
+
+    private void reportToMarkup() throws MojoExecutionException {
+        getLog().info("Rendering to " + outputFormat + " markup");
+
+        if (!isExternalReport()) {
+            String filename = getOutputName() + '.' + outputFormat;
+            try {
+                sinkFactory = container.lookup(SinkFactory.class, outputFormat);
+                sink = sinkFactory.createSink(outputDirectory, filename);
+            } catch (ComponentLookupException cle) {
+                throw new MojoExecutionException(
+                        "Cannot find SinkFactory for Doxia output format: " + outputFormat, cle);
+            } catch (IOException ioe) {
+                throw new MojoExecutionException("Cannot create sink to " + new File(outputDirectory, filename), ioe);
+            }
+        }
+
+        try {
+            Locale locale = getLocale();
+            generate(sink, sinkFactory, locale);
+        } catch (MavenReportException e) {
+            throw new MojoExecutionException(
+                    "An error has occurred in " + getName(Locale.ENGLISH) + " report generation.", e);
+        } finally {
+            if (sink != null) {
+                sink.close();
+            }
+        }
+    }
+
+    private void reportToSite() throws MojoExecutionException {
         File outputDirectory = new File(getOutputDirectory());
 
         String filename = getOutputName() + ".html";
@@ -351,7 +399,9 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
      * Actions when closing the report.
      */
     protected void closeReport() {
-        getSink().close();
+        if (getSink() != null) {
+            getSink().close();
+        }
     }
 
     /**
