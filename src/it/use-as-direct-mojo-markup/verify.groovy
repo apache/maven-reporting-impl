@@ -23,7 +23,7 @@ File f = new File( site, 'custom-report.xdoc' );
 assert f.exists();
 assert f.text.contains( 'Custom Maven Report content.' );
 
-f = new File( site, 'custom-report-with-renderer.apt' );
+f = new File( site, 'custom-report-with-renderer.markdown' );
 assert f.exists();
 assert f.text.contains( 'Custom Maven Report with Renderer content.' );
 
