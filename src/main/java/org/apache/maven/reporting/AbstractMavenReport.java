@@ -25,7 +25,6 @@ import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.SinkFactory;
 import org.apache.maven.doxia.site.decoration.DecorationModel;
-import org.apache.maven.doxia.site.decoration.Skin;
 import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.doxia.siterenderer.RendererException;
 import org.apache.maven.doxia.siterenderer.RenderingContext;
@@ -89,6 +88,12 @@ public abstract class AbstractMavenReport
     protected MavenProject project;
 
     /**
+     * The reactor projects.
+     */
+    @Parameter( defaultValue = "${reactorProjects}", required = true, readonly = true )
+    protected List<MavenProject> reactorProjects;
+
+    /**
      * Specifies the input encoding.
      */
     @Parameter( property = "encoding", defaultValue = "${project.build.sourceEncoding}", readonly = true )
@@ -113,21 +118,10 @@ public abstract class AbstractMavenReport
     protected List<ArtifactRepository> remoteRepositories;
 
     /**
-     * The skin to use when the report generation is invoked directly as a standalone Mojo.
-     * <p>
-     * <b>Default value is</b>:
-     * <pre>
-     * &lt;skin&gt;
-     *   &lt;groupId&gt;org.apache.maven.skins&lt;/groupId&gt;
-     *   &lt;artifactId&gt;maven-fluido-skin&lt;/artifactId&gt;
-     *   &lt;version&gt;1.11.1&lt;/version&gt;
-     * &lt;/skin&gt;
-     * </pre>
-     *
-     * @see Skin
+     * Directory containing the <code>site.xml</code> file.
      */
-    @Parameter
-    protected Skin skin;
+    @Parameter( defaultValue = "${basedir}/src/site" )
+    protected File siteDirectory;
 
     /**
      * The locale to use  when the report generation is invoked directly as a standalone Mojo.
@@ -212,7 +206,7 @@ public abstract class AbstractMavenReport
             // copy generated resources also
             getSiteRenderer().copyResources( siteContext, outputDirectory );
         }
-        catch ( RendererException | IOException | MavenReportException e )
+        catch ( RendererException | IOException | MavenReportException | SiteToolException e )
         {
             throw new MojoExecutionException(
                 "An error has occurred in " + getName( Locale.ENGLISH ) + " report generation.", e );
@@ -220,10 +214,10 @@ public abstract class AbstractMavenReport
     }
 
     private SiteRenderingContext createSiteRenderingContext( Locale locale )
-        throws MavenReportException, IOException
+        throws MavenReportException, IOException, SiteToolException
     {
-        DecorationModel decorationModel = new DecorationModel();
-        decorationModel.setSkin( getSkin() );
+        DecorationModel decorationModel = siteTool.getDecorationModel(
+            siteDirectory, locale, project, reactorProjects, localRepository, remoteRepositories );
 
         Map<String, Object> templateProperties = new HashMap<>();
         // We tell the skin that we are rendering in standalone mode
@@ -376,27 +370,6 @@ public abstract class AbstractMavenReport
     protected String getOutputEncoding()
     {
         return ( outputEncoding == null ) ? WriterFactory.UTF_8 : outputEncoding;
-    }
-
-    /**
-     * Gets the skin
-     *
-     * @return the skin for this standalone report
-     */
-    protected Skin getSkin()
-    {
-        if ( skin == null )
-        {
-            Skin skin = new Skin();
-            skin.setGroupId( "org.apache.maven.skins" );
-            skin.setArtifactId( "maven-fluido-skin" );
-            skin.setVersion( "1.11.1" );
-            return skin;
-        }
-        else
-        {
-            return skin;
-        }
     }
 
     /**
