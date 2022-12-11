@@ -119,10 +119,10 @@ public abstract class AbstractMavenReportRenderer
     {
         section++;
         sink.section( section, null );
-        sink.sectionTitle( section, null );
         sink.anchor( anchor );
-        text( name );
         sink.anchor_();
+        sink.sectionTitle( section, null );
+        text( name );
         sink.sectionTitle_( section );
     }
 
