@@ -194,7 +194,7 @@ public abstract class AbstractMavenReport
 
         try
         {
-            Locale locale = Locale.getDefault();
+            Locale locale = Locale.ROOT;
             generate( sink, sinkFactory, locale );
         }
         catch ( MavenReportException mre )
