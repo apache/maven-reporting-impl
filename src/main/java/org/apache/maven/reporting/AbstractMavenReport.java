@@ -172,14 +172,15 @@ public abstract class AbstractMavenReport
     private void reportToMarkup()
         throws MojoExecutionException
     {
-        getLog().info( "rendering to " + outputFormat + " markup" );
+        getLog().info( "Rendering to " + outputFormat + " markup" );
 
         if ( !isExternalReport() )
         {
             try
             {
                 sinkFactory = container.lookup( SinkFactory.class, outputFormat );
-                sink = sinkFactory.createSink( outputDirectory, getOutputName() + '.' + outputFormat );
+                String extension = "markdown".equals( outputFormat ) ? "md" : outputFormat; // TODO
+                sink = sinkFactory.createSink( outputDirectory, getOutputName() + '.' + extension );
             }
             catch ( ComponentLookupException cle )
             {
@@ -188,7 +189,7 @@ public abstract class AbstractMavenReport
             }
             catch ( IOException ioe )
             {
-                throw new MojoExecutionException( "Cannot create sink to " + outputDirectory, ioe );
+                throw new MojoExecutionException( "Cannot create sink for " + outputDirectory, ioe );
             }
         }
 
