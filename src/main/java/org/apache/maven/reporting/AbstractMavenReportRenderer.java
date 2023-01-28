@@ -154,6 +154,7 @@ public abstract class AbstractMavenReportRenderer
      */
     protected void startTable()
     {
+        // TODO pass null, since left is implied
         startTable( new int[] {Sink.JUSTIFY_LEFT}, false );
     }
 
@@ -374,6 +375,7 @@ public abstract class AbstractMavenReportRenderer
      */
     protected void verbatimText( String text )
     {
+        // FIXME drop BOXED
         sink.verbatim( SinkEventAttributeSet.BOXED );
 
         text( text );
@@ -399,6 +401,7 @@ public abstract class AbstractMavenReportRenderer
         }
         else
         {
+            // FIXME drop BOXED
             sink.verbatim( SinkEventAttributeSet.BOXED );
 
             link( href, text );
@@ -415,6 +418,7 @@ public abstract class AbstractMavenReportRenderer
      */
     protected void javaScript( String jsCode )
     {
+        // TODO drop type, it is implied in HTML5
         sink.rawText( "<script type=\"text/javascript\">\n" + jsCode + "</script>" );
     }
 
