@@ -20,7 +20,6 @@ package org.apache.maven.reporting;
  */
 
 import org.apache.maven.doxia.sink.Sink;
-import org.apache.maven.doxia.sink.impl.SinkEventAttributeSet;
 
 import org.apache.maven.shared.utils.StringUtils;
 
@@ -375,8 +374,7 @@ public abstract class AbstractMavenReportRenderer
      */
     protected void verbatimText( String text )
     {
-        // FIXME drop BOXED
-        sink.verbatim( SinkEventAttributeSet.BOXED );
+        sink.verbatim( null );
 
         text( text );
 
@@ -401,8 +399,7 @@ public abstract class AbstractMavenReportRenderer
         }
         else
         {
-            // FIXME drop BOXED
-            sink.verbatim( SinkEventAttributeSet.BOXED );
+            sink.verbatim( null );
 
             link( href, text );
 
