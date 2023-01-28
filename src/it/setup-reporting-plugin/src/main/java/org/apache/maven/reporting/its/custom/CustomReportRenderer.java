@@ -44,6 +44,10 @@ public class CustomReportRenderer
 
         text( "Custom Maven Report with Renderer content." );
 
+        verbatimText( "Custom verbatim text." );
+
+        verbatimSource( "var custom_code = true;" );
+
         endSection();
     }
 }

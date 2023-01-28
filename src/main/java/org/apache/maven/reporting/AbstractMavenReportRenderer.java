@@ -21,7 +21,7 @@ package org.apache.maven.reporting;
 
 import org.apache.maven.doxia.markup.Markup;
 import org.apache.maven.doxia.sink.Sink;
-
+import org.apache.maven.doxia.sink.impl.SinkEventAttributeSet;
 import org.apache.maven.shared.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -129,7 +129,7 @@ public abstract class AbstractMavenReportRenderer
     /**
      * Convenience method to wrap section ending in the current sink.
      *
-     * @see Sink#section_()
+     * @see Sink#section_(int)
      * @throws IllegalStateException if too many closing sections.
      */
     protected void endSection()
@@ -405,6 +405,23 @@ public abstract class AbstractMavenReportRenderer
 
             sink.verbatim_();
         }
+    }
+
+    /**
+     * Convenience method to wrap source code as verbatim style in the current sink .
+     *
+     * @param source a source code, could be null.
+     * @see #text(String)
+     * @see Sink#verbatim(org.apache.maven.doxia.sink.SinkEventAttributes)
+     * @see Sink#verbatim_()
+     */
+    protected void verbatimSource( String source )
+    {
+        sink.verbatim( SinkEventAttributeSet.SOURCE );
+
+        text( source );
+
+        sink.verbatim_();
     }
 
     /**
