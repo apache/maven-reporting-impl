@@ -153,8 +153,7 @@ public abstract class AbstractMavenReportRenderer
      */
     protected void startTable()
     {
-        // TODO pass null, since left is implied
-        startTable( new int[] {Sink.JUSTIFY_LEFT}, false );
+        startTable( null, false );
     }
 
     /**
