@@ -21,6 +21,7 @@ package org.apache.maven.reporting;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.SinkFactory;
 import org.apache.maven.doxia.site.decoration.DecorationModel;
@@ -47,6 +48,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -255,6 +257,14 @@ public abstract class AbstractMavenReport
         {
             throw new MavenReportException( "Failed to create context for skin", e );
         }
+
+        // Add publish date
+        String outputTimestamp = getProject().getProperties().getProperty( "project.build.outputTimestamp" );
+        MavenArchiver.parseBuildOutputTimestamp( outputTimestamp ).ifPresent( v ->
+            {
+                context.setPublishDate( Date.from( v ) );
+            }
+        );
 
         // Generate static site
         context.setRootDirectory( project.getBasedir() );
