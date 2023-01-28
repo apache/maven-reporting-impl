@@ -19,6 +19,7 @@ package org.apache.maven.reporting;
  * under the License.
  */
 
+import org.apache.maven.doxia.markup.Markup;
 import org.apache.maven.doxia.sink.Sink;
 
 import org.apache.maven.shared.utils.StringUtils;
@@ -414,8 +415,7 @@ public abstract class AbstractMavenReportRenderer
      */
     protected void javaScript( String jsCode )
     {
-        // TODO drop type, it is implied in HTML5
-        sink.rawText( "<script type=\"text/javascript\">\n" + jsCode + "</script>" );
+        sink.rawText( Markup.EOL + "<script>" + Markup.EOL + jsCode + Markup.EOL + "</script>" + Markup.EOL );
     }
 
     /**
