@@ -71,7 +71,7 @@
     <javaVersion>8</javaVersion>
     <mavenVersion>3.2.5</mavenVersion>
     <doxiaVersion>2.0.0-M5</doxiaVersion>
-    <doxiaSitetoolsVersion>2.0.0-M4</doxiaSitetoolsVersion>
+    <doxiaSitetoolsVersion>2.0.0-M5</doxiaSitetoolsVersion>
     <reportingApiVersion>4.0.0-M4</reportingApiVersion>
     <pluginToolsVersion>3.7.1</pluginToolsVersion>
     <project.build.outputTimestamp>2022-11-29T21:32:38Z</project.build.outputTimestamp>
