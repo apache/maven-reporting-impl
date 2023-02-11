@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements.  See the NOTICE file
@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.apache.maven.shared</groupId>
     <artifactId>maven-shared-components</artifactId>
-    <version>36</version>
+    <version>39</version>
     <relativePath />
   </parent>
 
@@ -49,8 +49,8 @@
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven-reporting-impl.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven-reporting-impl.git</developerConnection>
-    <url>https://github.com/apache/maven-reporting-impl/tree/${project.scm.tag}</url>
     <tag>HEAD</tag>
+    <url>https://github.com/apache/maven-reporting-impl/tree/${project.scm.tag}</url>
   </scm>
   <issueManagement>
     <system>jira</system>

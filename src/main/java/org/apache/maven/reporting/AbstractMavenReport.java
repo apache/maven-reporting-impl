@@ -1,5 +1,3 @@
-package org.apache.maven.reporting;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.reporting;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,10 +16,22 @@ package org.apache.maven.reporting;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.reporting;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.SinkFactory;
 import org.apache.maven.doxia.site.decoration.DecorationModel;
@@ -42,17 +52,6 @@ import org.codehaus.plexus.util.ReaderFactory;
 
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
 /**
  * The basis for a Maven report which can be generated both as part of a site generation or
  * as a direct standalone goal invocation.
@@ -69,58 +68,55 @@ import java.util.Map;
  *  from maven-reporting-api
  * @see #executeReport(Locale) <code>abstract executeReport( Locale )</code>
  */
-public abstract class AbstractMavenReport
-    extends AbstractMojo
-    implements MavenMultiPageReport
-{
+public abstract class AbstractMavenReport extends AbstractMojo implements MavenMultiPageReport {
     /**
      * The output directory for the report. Note that this parameter is only evaluated if the goal is run directly from
      * the command line. If the goal is run indirectly as part of a site generation, the output directory configured in
      * the Maven Site Plugin is used instead.
      */
-    @Parameter( defaultValue = "${project.reporting.outputDirectory}", readonly = true, required = true )
+    @Parameter(defaultValue = "${project.reporting.outputDirectory}", readonly = true, required = true)
     protected File outputDirectory;
 
     /**
      * The Maven Project.
      */
-    @Parameter( defaultValue = "${project}", readonly = true, required = true )
+    @Parameter(defaultValue = "${project}", readonly = true, required = true)
     protected MavenProject project;
 
     /**
      * The reactor projects.
      */
-    @Parameter( defaultValue = "${reactorProjects}", required = true, readonly = true )
+    @Parameter(defaultValue = "${reactorProjects}", required = true, readonly = true)
     protected List<MavenProject> reactorProjects;
 
     /**
      * Specifies the input encoding.
      */
-    @Parameter( property = "encoding", defaultValue = "${project.build.sourceEncoding}", readonly = true )
+    @Parameter(property = "encoding", defaultValue = "${project.build.sourceEncoding}", readonly = true)
     private String inputEncoding;
 
     /**
      * Specifies the output encoding.
      */
-    @Parameter( property = "outputEncoding", defaultValue = "${project.reporting.outputEncoding}", readonly = true )
+    @Parameter(property = "outputEncoding", defaultValue = "${project.reporting.outputEncoding}", readonly = true)
     private String outputEncoding;
 
     /**
      * The local repository.
      */
-    @Parameter( defaultValue = "${localRepository}", readonly = true, required = true )
+    @Parameter(defaultValue = "${localRepository}", readonly = true, required = true)
     protected ArtifactRepository localRepository;
 
     /**
      * Remote repositories used for the project.
      */
-    @Parameter( defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true )
+    @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true)
     protected List<ArtifactRepository> remoteRepositories;
 
     /**
      * Directory containing the <code>site.xml</code> file.
      */
-    @Parameter( defaultValue = "${basedir}/src/site" )
+    @Parameter(defaultValue = "${basedir}/src/site")
     protected File siteDirectory;
 
     /**
@@ -130,8 +126,7 @@ public abstract class AbstractMavenReport
      *
      * @see SiteTool#getSiteLocales(String)
      */
-
-    @Parameter( defaultValue = "default" )
+    @Parameter(defaultValue = "default")
     protected String locale;
 
     /**
@@ -162,106 +157,91 @@ public abstract class AbstractMavenReport
      * @see org.apache.maven.plugin.Mojo#execute()
      */
     @Override
-    public void execute()
-        throws MojoExecutionException
-    {
-        if ( !canGenerateReport() )
-        {
+    public void execute() throws MojoExecutionException {
+        if (!canGenerateReport()) {
             return;
         }
 
-        File outputDirectory = new File( getOutputDirectory() );
+        File outputDirectory = new File(getOutputDirectory());
 
         String filename = getOutputName() + ".html";
 
         Locale locale = getLocale();
 
-        try
-        {
-            SiteRenderingContext siteContext = createSiteRenderingContext( locale );
+        try {
+            SiteRenderingContext siteContext = createSiteRenderingContext(locale);
 
             // copy resources
-            getSiteRenderer().copyResources( siteContext, outputDirectory );
+            getSiteRenderer().copyResources(siteContext, outputDirectory);
 
             // TODO Replace null with real value
-            RenderingContext docRenderingContext = new RenderingContext( outputDirectory, filename, null );
+            RenderingContext docRenderingContext = new RenderingContext(outputDirectory, filename, null);
 
-            SiteRendererSink sink = new SiteRendererSink( docRenderingContext );
+            SiteRendererSink sink = new SiteRendererSink(docRenderingContext);
 
-            generate( sink, null, locale );
+            generate(sink, null, locale);
 
-            if ( !isExternalReport() ) // MSHARED-204: only render Doxia sink if not an external report
+            if (!isExternalReport()) // MSHARED-204: only render Doxia sink if not an external report
             {
                 outputDirectory.mkdirs();
 
-                try ( Writer writer =
-                      new OutputStreamWriter( new FileOutputStream( new File( outputDirectory, filename ) ),
-                                              getOutputEncoding() ) )
-                {
+                try (Writer writer = new OutputStreamWriter(
+                        new FileOutputStream(new File(outputDirectory, filename)), getOutputEncoding())) {
                     // render report
-                    getSiteRenderer().mergeDocumentIntoSite( writer, sink, siteContext );
+                    getSiteRenderer().mergeDocumentIntoSite(writer, sink, siteContext);
                 }
             }
 
             // copy generated resources also
-            getSiteRenderer().copyResources( siteContext, outputDirectory );
-        }
-        catch ( RendererException | IOException | MavenReportException | SiteToolException e )
-        {
+            getSiteRenderer().copyResources(siteContext, outputDirectory);
+        } catch (RendererException | IOException | MavenReportException | SiteToolException e) {
             throw new MojoExecutionException(
-                "An error has occurred in " + getName( Locale.ENGLISH ) + " report generation.", e );
+                    "An error has occurred in " + getName(Locale.ENGLISH) + " report generation.", e);
         }
     }
 
-    private SiteRenderingContext createSiteRenderingContext( Locale locale )
-        throws MavenReportException, IOException, SiteToolException
-    {
+    private SiteRenderingContext createSiteRenderingContext(Locale locale)
+            throws MavenReportException, IOException, SiteToolException {
         DecorationModel decorationModel = siteTool.getDecorationModel(
-            siteDirectory, locale, project, reactorProjects, localRepository, remoteRepositories );
+                siteDirectory, locale, project, reactorProjects, localRepository, remoteRepositories);
 
         Map<String, Object> templateProperties = new HashMap<>();
         // We tell the skin that we are rendering in standalone mode
-        templateProperties.put( "standalone", Boolean.TRUE );
-        templateProperties.put( "project", getProject() );
-        templateProperties.put( "inputEncoding", getInputEncoding() );
-        templateProperties.put( "outputEncoding", getOutputEncoding() );
+        templateProperties.put("standalone", Boolean.TRUE);
+        templateProperties.put("project", getProject());
+        templateProperties.put("inputEncoding", getInputEncoding());
+        templateProperties.put("outputEncoding", getOutputEncoding());
         // Put any of the properties in directly into the Velocity context
-        for ( Map.Entry<Object, Object> entry : getProject().getProperties().entrySet() )
-        {
-            templateProperties.put( (String) entry.getKey(), entry.getValue() );
+        for (Map.Entry<Object, Object> entry : getProject().getProperties().entrySet()) {
+            templateProperties.put((String) entry.getKey(), entry.getValue());
         }
 
         SiteRenderingContext context;
-        try
-        {
+        try {
             Artifact skinArtifact =
-                siteTool.getSkinArtifactFromRepository( localRepository, remoteRepositories, decorationModel );
+                    siteTool.getSkinArtifactFromRepository(localRepository, remoteRepositories, decorationModel);
 
-            getLog().info( buffer().a( "Rendering content with " ).strong( skinArtifact.getId()
-                + " skin" ).a( '.' ).toString() );
+            getLog().info(buffer().a("Rendering content with ")
+                    .strong(skinArtifact.getId() + " skin")
+                    .a('.')
+                    .toString());
 
-            context = siteRenderer.createContextForSkin( skinArtifact, templateProperties, decorationModel,
-                                                         project.getName(), locale );
-        }
-        catch ( SiteToolException e )
-        {
-            throw new MavenReportException( "Failed to retrieve skin artifact", e );
-        }
-        catch ( RendererException e )
-        {
-            throw new MavenReportException( "Failed to create context for skin", e );
+            context = siteRenderer.createContextForSkin(
+                    skinArtifact, templateProperties, decorationModel, project.getName(), locale);
+        } catch (SiteToolException e) {
+            throw new MavenReportException("Failed to retrieve skin artifact", e);
+        } catch (RendererException e) {
+            throw new MavenReportException("Failed to create context for skin", e);
         }
 
         // Add publish date
-        String outputTimestamp = getProject().getProperties().getProperty( "project.build.outputTimestamp" );
-        MavenArchiver.parseBuildOutputTimestamp( outputTimestamp ).ifPresent( v ->
-            {
-                context.setPublishDate( Date.from( v ) );
-            }
-        );
+        String outputTimestamp = getProject().getProperties().getProperty("project.build.outputTimestamp");
+        MavenArchiver.parseBuildOutputTimestamp(outputTimestamp).ifPresent(v -> {
+            context.setPublishDate(Date.from(v));
+        });
 
         // Generate static site
-        context.setRootDirectory( project.getBasedir() );
+        context.setRootDirectory(project.getBasedir());
 
         return context;
     }
@@ -276,10 +256,8 @@ public abstract class AbstractMavenReport
      */
     @Deprecated
     @Override
-    public void generate( Sink sink, Locale locale )
-        throws MavenReportException
-    {
-        generate( sink, null, locale );
+    public void generate(Sink sink, Locale locale) throws MavenReportException {
+        generate(sink, null, locale);
     }
 
     /**
@@ -291,13 +269,10 @@ public abstract class AbstractMavenReport
      * @throws MavenReportException
      */
     @Override
-    public void generate( Sink sink, SinkFactory sinkFactory, Locale locale )
-        throws MavenReportException
-    {
-        if ( !canGenerateReport() )
-        {
-            getLog().info( "This report cannot be generated as part of the current build. "
-                           + "The report name should be referenced in this line of output." );
+    public void generate(Sink sink, SinkFactory sinkFactory, Locale locale) throws MavenReportException {
+        if (!canGenerateReport()) {
+            getLog().info("This report cannot be generated as part of the current build. "
+                    + "The report name should be referenced in this line of output.");
             return;
         }
 
@@ -305,7 +280,7 @@ public abstract class AbstractMavenReport
 
         this.sinkFactory = sinkFactory;
 
-        executeReport( locale );
+        executeReport(locale);
 
         closeReport();
     }
@@ -314,41 +289,34 @@ public abstract class AbstractMavenReport
      * @return CATEGORY_PROJECT_REPORTS
      */
     @Override
-    public String getCategoryName()
-    {
+    public String getCategoryName() {
         return CATEGORY_PROJECT_REPORTS;
     }
 
     @Override
-    public File getReportOutputDirectory()
-    {
-        if ( reportOutputDirectory == null )
-        {
-            reportOutputDirectory = new File( getOutputDirectory() );
+    public File getReportOutputDirectory() {
+        if (reportOutputDirectory == null) {
+            reportOutputDirectory = new File(getOutputDirectory());
         }
 
         return reportOutputDirectory;
     }
 
     @Override
-    public void setReportOutputDirectory( File reportOutputDirectory )
-    {
+    public void setReportOutputDirectory(File reportOutputDirectory) {
         this.reportOutputDirectory = reportOutputDirectory;
         this.outputDirectory = reportOutputDirectory;
     }
 
-    protected String getOutputDirectory()
-    {
+    protected String getOutputDirectory() {
         return outputDirectory.getAbsolutePath();
     }
 
-    protected MavenProject getProject()
-    {
+    protected MavenProject getProject() {
         return project;
     }
 
-    protected Renderer getSiteRenderer()
-    {
+    protected Renderer getSiteRenderer() {
         return siteRenderer;
     }
 
@@ -357,9 +325,8 @@ public abstract class AbstractMavenReport
      *
      * @return The input files encoding, never <code>null</code>.
      */
-    protected String getInputEncoding()
-    {
-        return ( inputEncoding == null ) ? ReaderFactory.FILE_ENCODING : inputEncoding;
+    protected String getInputEncoding() {
+        return (inputEncoding == null) ? ReaderFactory.FILE_ENCODING : inputEncoding;
     }
 
     /**
@@ -367,9 +334,8 @@ public abstract class AbstractMavenReport
      *
      * @return The effective reporting output file encoding, never <code>null</code>.
      */
-    protected String getOutputEncoding()
-    {
-        return ( outputEncoding == null ) ? WriterFactory.UTF_8 : outputEncoding;
+    protected String getOutputEncoding() {
+        return (outputEncoding == null) ? WriterFactory.UTF_8 : outputEncoding;
     }
 
     /**
@@ -377,32 +343,28 @@ public abstract class AbstractMavenReport
      *
      * @return the locale for this standalone report
      */
-    protected Locale getLocale()
-    {
-        return siteTool.getSiteLocales( locale ).get( 0 );
+    protected Locale getLocale() {
+        return siteTool.getSiteLocales(locale).get(0);
     }
 
     /**
      * Actions when closing the report.
      */
-    protected void closeReport()
-    {
+    protected void closeReport() {
         getSink().close();
     }
 
     /**
      * @return the sink used
      */
-    public Sink getSink()
-    {
+    public Sink getSink() {
         return sink;
     }
 
     /**
      * @return the sink factory used
      */
-    public SinkFactory getSinkFactory()
-    {
+    public SinkFactory getSinkFactory() {
         return sinkFactory;
     }
 
@@ -411,14 +373,12 @@ public abstract class AbstractMavenReport
      * @return {@code false} by default.
      */
     @Override
-    public boolean isExternalReport()
-    {
+    public boolean isExternalReport() {
         return false;
     }
 
     @Override
-    public boolean canGenerateReport()
-    {
+    public boolean canGenerateReport() {
         return true;
     }
 
@@ -428,6 +388,5 @@ public abstract class AbstractMavenReport
      * @param locale the wanted locale to return the report's description, could be <code>null</code>.
      * @throws MavenReportException if any
      */
-    protected abstract void executeReport( Locale locale )
-        throws MavenReportException;
+    protected abstract void executeReport(Locale locale) throws MavenReportException;
 }

@@ -1,7 +1,23 @@
-package org.apache.maven.reporting;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.maven.reporting;
+/*
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
  * regarding copyright ownership.  The ASF licenses this file
@@ -19,17 +35,17 @@ package org.apache.maven.reporting;
  * under the License.
  */
 
-import org.apache.maven.doxia.markup.Markup;
-import org.apache.maven.doxia.sink.Sink;
-import org.apache.maven.doxia.sink.impl.SinkEventAttributeSet;
-import org.apache.maven.shared.utils.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import org.apache.maven.doxia.markup.Markup;
+import org.apache.maven.doxia.sink.Sink;
+import org.apache.maven.doxia.sink.impl.SinkEventAttributeSet;
+import org.apache.maven.shared.utils.StringUtils;
 
 /**
  * <p>An abstract class to manage report generation, with many helper methods to ease the job: you just need to
@@ -46,9 +62,7 @@ import java.util.Properties;
  * @see #getTitle()
  * @see #renderBody()
  */
-public abstract class AbstractMavenReportRenderer
-    implements MavenReportRenderer
-{
+public abstract class AbstractMavenReportRenderer implements MavenReportRenderer {
     /** The current sink to use */
     protected Sink sink;
 
@@ -60,19 +74,17 @@ public abstract class AbstractMavenReportRenderer
      *
      * @param sink the sink to use.
      */
-    public AbstractMavenReportRenderer( Sink sink )
-    {
+    public AbstractMavenReportRenderer(Sink sink) {
         this.sink = sink;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void render()
-    {
+    public void render() {
         sink.head();
 
         sink.title();
-        text( getTitle() );
+        text(getTitle());
         sink.title_();
 
         sink.head_();
@@ -100,9 +112,8 @@ public abstract class AbstractMavenReportRenderer
      * @see Sink#sectionTitle(int, org.apache.maven.doxia.sink.SinkEventAttributes)
      * @see Sink#sectionTitle_(int)
      */
-    protected void startSection( String name )
-    {
-        startSection( name, name );
+    protected void startSection(String name) {
+        startSection(name, name);
     }
 
     /**
@@ -115,15 +126,14 @@ public abstract class AbstractMavenReportRenderer
      * @see Sink#sectionTitle(int, org.apache.maven.doxia.sink.SinkEventAttributes)
      * @see Sink#sectionTitle_(int)
      */
-    protected void startSection( String name, String anchor )
-    {
+    protected void startSection(String name, String anchor) {
         section++;
-        sink.section( section, null );
-        sink.anchor( anchor );
+        sink.section(section, null);
+        sink.anchor(anchor);
         sink.anchor_();
-        sink.sectionTitle( section, null );
-        text( name );
-        sink.sectionTitle_( section );
+        sink.sectionTitle(section, null);
+        text(name);
+        sink.sectionTitle_(section);
     }
 
     /**
@@ -132,14 +142,12 @@ public abstract class AbstractMavenReportRenderer
      * @see Sink#section_(int)
      * @throws IllegalStateException if too many closing sections.
      */
-    protected void endSection()
-    {
-        sink.section_( section );
+    protected void endSection() {
+        sink.section_(section);
         section--;
 
-        if ( section < 0 )
-        {
-            throw new IllegalStateException( "Too many closing sections" );
+        if (section < 0) {
+            throw new IllegalStateException("Too many closing sections");
         }
     }
 
@@ -152,9 +160,8 @@ public abstract class AbstractMavenReportRenderer
      *
      * @see Sink#table()
      */
-    protected void startTable()
-    {
-        startTable( null, false );
+    protected void startTable() {
+        startTable(null, false);
     }
 
     /**
@@ -167,10 +174,9 @@ public abstract class AbstractMavenReportRenderer
      * @see Sink#tableRows(int[],boolean)
      * @since 2.1
      */
-    protected void startTable( int[] justification, boolean grid )
-    {
+    protected void startTable(int[] justification, boolean grid) {
         sink.table();
-        sink.tableRows( justification, grid );
+        sink.tableRows(justification, grid);
     }
 
     /**
@@ -178,8 +184,7 @@ public abstract class AbstractMavenReportRenderer
      *
      * @see Sink#table_()
      */
-    protected void endTable()
-    {
+    protected void endTable() {
         sink.tableRows_();
         sink.table_();
     }
@@ -192,11 +197,10 @@ public abstract class AbstractMavenReportRenderer
      * @see Sink#tableHeaderCell()
      * @see Sink#tableHeaderCell_()
      */
-    protected void tableHeaderCell( String text )
-    {
+    protected void tableHeaderCell(String text) {
         sink.tableHeaderCell();
 
-        text( text );
+        text(text);
 
         sink.tableHeaderCell_();
     }
@@ -209,9 +213,8 @@ public abstract class AbstractMavenReportRenderer
      * @see #linkPatternedText(String)
      * @see #tableCell(String)
      */
-    protected void tableCell( String text )
-    {
-        tableCell( text, false );
+    protected void tableCell(String text) {
+        tableCell(text, false);
     }
 
     /**
@@ -226,17 +229,13 @@ public abstract class AbstractMavenReportRenderer
      * @see Sink#tableCell_()
      * @see Sink#rawText(String)
      */
-    protected void tableCell( String text, boolean asHtml )
-    {
+    protected void tableCell(String text, boolean asHtml) {
         sink.tableCell();
 
-        if ( asHtml )
-        {
-            sink.rawText( text );
-        }
-        else
-        {
-            linkPatternedText( text );
+        if (asHtml) {
+            sink.rawText(text);
+        } else {
+            linkPatternedText(text);
         }
 
         sink.tableCell_();
@@ -251,15 +250,12 @@ public abstract class AbstractMavenReportRenderer
      * @see Sink#tableRow()
      * @see Sink#tableRow_()
      */
-    protected void tableRow( String[] content )
-    {
+    protected void tableRow(String[] content) {
         sink.tableRow();
 
-        if ( content != null )
-        {
-            for ( int i = 0; i < content.length; i++ )
-            {
-                tableCell( content[i] );
+        if (content != null) {
+            for (int i = 0; i < content.length; i++) {
+                tableCell(content[i]);
             }
         }
 
@@ -274,15 +270,12 @@ public abstract class AbstractMavenReportRenderer
      * @see Sink#tableRow()
      * @see Sink#tableRow_()
      */
-    protected void tableHeader( String[] content )
-    {
+    protected void tableHeader(String[] content) {
         sink.tableRow();
 
-        if ( content != null )
-        {
-            for ( int i = 0; i < content.length; i++ )
-            {
-                tableHeaderCell( content[i] );
+        if (content != null) {
+            for (int i = 0; i < content.length; i++) {
+                tableHeaderCell(content[i]);
             }
         }
 
@@ -297,11 +290,10 @@ public abstract class AbstractMavenReportRenderer
      * @see Sink#tableCaption()
      * @see Sink#tableCaption_()
      */
-    protected void tableCaption( String caption )
-    {
+    protected void tableCaption(String caption) {
         sink.tableCaption();
 
-        text( caption );
+        text(caption);
 
         sink.tableCaption_();
     }
@@ -318,11 +310,10 @@ public abstract class AbstractMavenReportRenderer
      * @see Sink#paragraph()
      * @see Sink#paragraph_()
      */
-    protected void paragraph( String paragraph )
-    {
+    protected void paragraph(String paragraph) {
         sink.paragraph();
 
-        text( paragraph );
+        text(paragraph);
 
         sink.paragraph_();
     }
@@ -336,11 +327,10 @@ public abstract class AbstractMavenReportRenderer
      * @see Sink#link(String)
      * @see Sink#link_()
      */
-    protected void link( String href, String name )
-    {
-        sink.link( href );
+    protected void link(String href, String name) {
+        sink.link(href);
 
-        text( name );
+        text(name);
 
         sink.link_();
     }
@@ -352,15 +342,12 @@ public abstract class AbstractMavenReportRenderer
      * @param text a text, could be null.
      * @see Sink#text(String)
      */
-    protected void text( String text )
-    {
-        if ( StringUtils.isEmpty( text ) ) // Take care of spaces
+    protected void text(String text) {
+        if (StringUtils.isEmpty(text)) // Take care of spaces
         {
-            sink.text( "-" );
-        }
-        else
-        {
-            sink.text( text );
+            sink.text("-");
+        } else {
+            sink.text(text);
         }
     }
 
@@ -372,11 +359,10 @@ public abstract class AbstractMavenReportRenderer
      * @see Sink#verbatim(org.apache.maven.doxia.sink.SinkEventAttributes)
      * @see Sink#verbatim_()
      */
-    protected void verbatimText( String text )
-    {
-        sink.verbatim( null );
+    protected void verbatimText(String text) {
+        sink.verbatim(null);
 
-        text( text );
+        text(text);
 
         sink.verbatim_();
     }
@@ -391,17 +377,13 @@ public abstract class AbstractMavenReportRenderer
      * @see Sink#verbatim(org.apache.maven.doxia.sink.SinkEventAttributes)
      * @see Sink#verbatim_()
      */
-    protected void verbatimLink( String text, String href )
-    {
-        if ( StringUtils.isEmpty( href ) )
-        {
-            verbatimText( text );
-        }
-        else
-        {
-            sink.verbatim( null );
+    protected void verbatimLink(String text, String href) {
+        if (StringUtils.isEmpty(href)) {
+            verbatimText(text);
+        } else {
+            sink.verbatim(null);
 
-            link( href, text );
+            link(href, text);
 
             sink.verbatim_();
         }
@@ -415,11 +397,10 @@ public abstract class AbstractMavenReportRenderer
      * @see Sink#verbatim(org.apache.maven.doxia.sink.SinkEventAttributes)
      * @see Sink#verbatim_()
      */
-    protected void verbatimSource( String source )
-    {
-        sink.verbatim( SinkEventAttributeSet.SOURCE );
+    protected void verbatimSource(String source) {
+        sink.verbatim(SinkEventAttributeSet.SOURCE);
 
-        text( source );
+        text(source);
 
         sink.verbatim_();
     }
@@ -430,9 +411,8 @@ public abstract class AbstractMavenReportRenderer
      * @param jsCode a string of Javascript
      * @see Sink#rawText(String)
      */
-    protected void javaScript( String jsCode )
-    {
-        sink.rawText( Markup.EOL + "<script>" + Markup.EOL + jsCode + Markup.EOL + "</script>" + Markup.EOL );
+    protected void javaScript(String jsCode) {
+        sink.rawText(Markup.EOL + "<script>" + Markup.EOL + jsCode + Markup.EOL + "</script>" + Markup.EOL);
     }
 
     /**
@@ -445,34 +425,23 @@ public abstract class AbstractMavenReportRenderer
      * @see #link(String, String)
      * @see #applyPattern(String)
      */
-    public void linkPatternedText( String text )
-    {
-        if ( StringUtils.isEmpty( text ) )
-        {
-            text( text );
-        }
-        else
-        {
-            List<String> segments = applyPattern( text );
+    public void linkPatternedText(String text) {
+        if (StringUtils.isEmpty(text)) {
+            text(text);
+        } else {
+            List<String> segments = applyPattern(text);
 
-            if ( segments == null )
-            {
-                text( text );
-            }
-            else
-            {
-                for ( Iterator<String> it = segments.iterator(); it.hasNext(); )
-                {
+            if (segments == null) {
+                text(text);
+            } else {
+                for (Iterator<String> it = segments.iterator(); it.hasNext(); ) {
                     String name = it.next();
                     String href = it.next();
 
-                    if ( href == null )
-                    {
-                        text( name );
-                    }
-                    else
-                    {
-                       link( href, name );
+                    if (href == null) {
+                        text(name);
+                    } else {
+                        link(href, name);
                     }
                 }
             }
@@ -489,15 +458,12 @@ public abstract class AbstractMavenReportRenderer
      * @return a link pattern
      * @see #linkPatternedText(String)
      */
-    protected static String createLinkPatternedText( String text, String href )
-    {
-        if ( text == null )
-        {
+    protected static String createLinkPatternedText(String text, String href) {
+        if (text == null) {
             return text;
         }
 
-        if ( href == null )
-        {
+        if (href == null) {
             return text;
         }
 
@@ -510,23 +476,19 @@ public abstract class AbstractMavenReportRenderer
      * @param props the properties to display.
      * @return the properties object as comma separated String
      */
-    protected static String propertiesToString( Properties props )
-    {
-        if ( props == null || props.isEmpty() )
-        {
+    protected static String propertiesToString(Properties props) {
+        if (props == null || props.isEmpty()) {
             return "";
         }
 
         StringBuilder sb = new StringBuilder();
 
-        for ( Map.Entry<?, ?> entry : props.entrySet() )
-        {
-            if ( sb.length() > 0 )
-            {
-                sb.append( ", " );
+        for (Map.Entry<?, ?> entry : props.entrySet()) {
+            if (sb.length() > 0) {
+                sb.append(", ");
             }
 
-            sb.append( entry.getKey() ).append( "=" ).append( entry.getValue() );
+            sb.append(entry.getKey()).append("=").append(entry.getValue());
         }
 
         return sb.toString();
@@ -543,10 +505,8 @@ public abstract class AbstractMavenReportRenderer
      * @param text a text with or without the pattern <code>{text, url}</code>
      * @return a map of text/href
      */
-    private static List<String> applyPattern( String text )
-    {
-        if ( StringUtils.isEmpty( text ) )
-        {
+    private static List<String> applyPattern(String text) {
+        if (StringUtils.isEmpty(text)) {
             return null;
         }
 
@@ -555,19 +515,15 @@ public abstract class AbstractMavenReportRenderer
         List<String> segments = new ArrayList<>();
 
         // TODO Special case http://jira.codehaus.org/browse/MEV-40
-        if ( text.indexOf( "${" ) != -1 )
-        {
-            int lastComma = text.lastIndexOf( "," );
-            int lastSemi = text.lastIndexOf( "}" );
-            if ( lastComma != -1 && lastSemi != -1 && lastComma < lastSemi )
-            {
-                segments.add( text.substring( lastComma + 1, lastSemi ).trim() );
-                segments.add( null );
-            }
-            else
-            {
-                segments.add( text );
-                segments.add( null );
+        if (text.indexOf("${") != -1) {
+            int lastComma = text.lastIndexOf(",");
+            int lastSemi = text.lastIndexOf("}");
+            if (lastComma != -1 && lastSemi != -1 && lastComma < lastSemi) {
+                segments.add(text.substring(lastComma + 1, lastSemi).trim());
+                segments.add(null);
+            } else {
+                segments.add(text);
+                segments.add(null);
             }
 
             return segments;
@@ -577,38 +533,28 @@ public abstract class AbstractMavenReportRenderer
         int braceStack = 0;
         int lastOffset = 0;
 
-        for ( int i = 0; i < text.length(); i++ )
-        {
-            char ch = text.charAt( i );
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
 
-            if ( ch == '\'' && !inQuote && braceStack == 0 )
-            {
+            if (ch == '\'' && !inQuote && braceStack == 0) {
                 // handle: ''
-                if ( i + 1 < text.length() && text.charAt( i + 1 ) == '\'' )
-                {
+                if (i + 1 < text.length() && text.charAt(i + 1) == '\'') {
                     i++;
-                    segments.add( text.substring( lastOffset, i ) );
-                    segments.add( null );
+                    segments.add(text.substring(lastOffset, i));
+                    segments.add(null);
                     lastOffset = i + 1;
-                }
-                else
-                {
+                } else {
                     inQuote = true;
                 }
-            }
-            else
-            {
-                switch ( ch )
-                {
+            } else {
+                switch (ch) {
                     case '{':
-                        if ( !inQuote )
-                        {
-                            if ( braceStack == 0 )
-                            {
-                                if ( i != lastOffset ) // handle { at first character
+                        if (!inQuote) {
+                            if (braceStack == 0) {
+                                if (i != lastOffset) // handle { at first character
                                 {
-                                    segments.add( text.substring( lastOffset, i ) );
-                                    segments.add( null );
+                                    segments.add(text.substring(lastOffset, i));
+                                    segments.add(null);
                                 }
                                 lastOffset = i + 1;
                             }
@@ -616,24 +562,21 @@ public abstract class AbstractMavenReportRenderer
                         }
                         break;
                     case '}':
-                        if ( !inQuote )
-                        {
+                        if (!inQuote) {
                             braceStack--;
-                            if ( braceStack == 0 )
-                            {
-                                String subString = text.substring( lastOffset, i );
+                            if (braceStack == 0) {
+                                String subString = text.substring(lastOffset, i);
                                 lastOffset = i + 1;
 
-                                int lastComma = subString.lastIndexOf( "," );
-                                if ( lastComma != -1 )
-                                {
-                                    segments.add( subString.substring( 0, lastComma ).trim() );
-                                    segments.add( subString.substring( lastComma + 1 ).trim() );
-                                }
-                                else
-                                {
-                                    segments.add( subString );
-                                    segments.add( null );
+                                int lastComma = subString.lastIndexOf(",");
+                                if (lastComma != -1) {
+                                    segments.add(
+                                            subString.substring(0, lastComma).trim());
+                                    segments.add(
+                                            subString.substring(lastComma + 1).trim());
+                                } else {
+                                    segments.add(subString);
+                                    segments.add(null);
                                 }
                             }
                         }
@@ -647,24 +590,21 @@ public abstract class AbstractMavenReportRenderer
             }
         }
 
-        if ( !StringUtils.isEmpty( text.substring( lastOffset ) ) )
-        {
-            segments.add( text.substring( lastOffset ) );
-            segments.add( null );
+        if (!StringUtils.isEmpty(text.substring(lastOffset))) {
+            segments.add(text.substring(lastOffset));
+            segments.add(null);
         }
 
-        if ( braceStack != 0 )
-        {
-            throw new IllegalArgumentException( "Unmatched braces in the pattern." );
+        if (braceStack != 0) {
+            throw new IllegalArgumentException("Unmatched braces in the pattern.");
         }
 
-        if ( inQuote )
-        {
-            //throw new IllegalArgumentException( "Unmatched quote in the pattern." );
-            //TODO: warning...
+        if (inQuote) {
+            // throw new IllegalArgumentException( "Unmatched quote in the pattern." );
+            // TODO: warning...
         }
 
-        return Collections.unmodifiableList( segments );
+        return Collections.unmodifiableList(segments);
     }
 
     // ----------------------------------------------------------------------
