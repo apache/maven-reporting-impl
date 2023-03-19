@@ -73,7 +73,7 @@
     <doxiaVersion>2.0.0-M5</doxiaVersion>
     <doxiaSitetoolsVersion>2.0.0-M5</doxiaSitetoolsVersion>
     <reportingApiVersion>4.0.0-M4</reportingApiVersion>
-    <pluginToolsVersion>3.7.1</pluginToolsVersion>
+    <pluginToolsVersion>3.8.1</pluginToolsVersion>
     <project.build.outputTimestamp>2023-02-11T19:43:02Z</project.build.outputTimestamp>
   </properties>
 
@@ -154,7 +154,7 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>3.5.0</version>
+      <version>3.5.1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -166,7 +166,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.9.0</version>
+      <version>5.9.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

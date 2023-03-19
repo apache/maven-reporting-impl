@@ -29,10 +29,10 @@ text = f.text.normalize();
 assert text.contains( 'Custom Maven Report with Renderer content.' );
 // TODO align with use-as-direct-mojo as soon as Maven Site Plugin uses Doxia 2.0.0-M5
 assert text.contains( '''\
-<div>
+<div class="verbatim">
 <pre>Custom verbatim text.</pre></div>'''.normalize() );
 assert text.contains( '''\
-<div>
+<div class="verbatim source">
 <pre>var custom_code = true;</pre></div>'''.normalize() );
 
 f = new File( site, 'external/report.html' );
