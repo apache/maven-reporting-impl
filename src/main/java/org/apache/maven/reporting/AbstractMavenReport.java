@@ -31,7 +31,6 @@ import java.util.Map;
 
 import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.SinkFactory;
 import org.apache.maven.doxia.site.decoration.DecorationModel;
@@ -51,6 +50,8 @@ import org.apache.maven.shared.utils.WriterFactory;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.ReaderFactory;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
 
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
@@ -104,16 +105,16 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     private String outputEncoding;
 
     /**
-     * The local repository.
+     * The repository system session.
      */
-    @Parameter(defaultValue = "${localRepository}", readonly = true, required = true)
-    protected ArtifactRepository localRepository;
+    @Parameter(defaultValue = "${repositorySystemSession}", readonly = true, required = true)
+    protected RepositorySystemSession repoSession;
 
     /**
-     * Remote repositories used for the project.
+     * Remote project repositories used for the project.
      */
-    @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true)
-    protected List<ArtifactRepository> remoteRepositories;
+    @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true, required = true)
+    protected List<RemoteRepository> remoteProjectRepositories;
 
     /**
      * Directory containing the <code>site.xml</code> file.
@@ -251,7 +252,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     private SiteRenderingContext createSiteRenderingContext(Locale locale)
             throws MavenReportException, IOException, SiteToolException {
         DecorationModel decorationModel = siteTool.getDecorationModel(
-                siteDirectory, locale, project, reactorProjects, localRepository, remoteRepositories);
+                siteDirectory, locale, project, reactorProjects, repoSession, remoteProjectRepositories);
 
         Map<String, Object> templateProperties = new HashMap<>();
         // We tell the skin that we are rendering in standalone mode
@@ -266,8 +267,8 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
 
         SiteRenderingContext context;
         try {
-            Artifact skinArtifact =
-                    siteTool.getSkinArtifactFromRepository(localRepository, remoteRepositories, decorationModel);
+            Artifact skinArtifact = siteTool.getSkinArtifactFromRepository(
+                    repoSession, remoteProjectRepositories, decorationModel.getSkin());
 
             getLog().info(buffer().a("Rendering content with ")
                     .strong(skinArtifact.getId() + " skin")
