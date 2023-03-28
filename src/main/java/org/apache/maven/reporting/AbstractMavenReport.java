@@ -33,10 +33,10 @@ import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.SinkFactory;
-import org.apache.maven.doxia.site.decoration.DecorationModel;
+import org.apache.maven.doxia.site.SiteModel;
+import org.apache.maven.doxia.siterenderer.DocumentRenderingContext;
 import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.doxia.siterenderer.RendererException;
-import org.apache.maven.doxia.siterenderer.RenderingContext;
 import org.apache.maven.doxia.siterenderer.SiteRenderingContext;
 import org.apache.maven.doxia.siterenderer.sink.SiteRendererSink;
 import org.apache.maven.doxia.tools.SiteTool;
@@ -224,7 +224,8 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
             getSiteRenderer().copyResources(siteContext, outputDirectory);
 
             // TODO Replace null with real value
-            RenderingContext docRenderingContext = new RenderingContext(outputDirectory, filename, null);
+            DocumentRenderingContext docRenderingContext =
+                    new DocumentRenderingContext(outputDirectory, filename, null);
 
             SiteRendererSink sink = new SiteRendererSink(docRenderingContext);
 
@@ -251,7 +252,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
 
     private SiteRenderingContext createSiteRenderingContext(Locale locale)
             throws MavenReportException, IOException, SiteToolException {
-        DecorationModel decorationModel = siteTool.getDecorationModel(
+        SiteModel siteModel = siteTool.getSiteModel(
                 siteDirectory, locale, project, reactorProjects, repoSession, remoteProjectRepositories);
 
         Map<String, Object> templateProperties = new HashMap<>();
@@ -267,8 +268,8 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
 
         SiteRenderingContext context;
         try {
-            Artifact skinArtifact = siteTool.getSkinArtifactFromRepository(
-                    repoSession, remoteProjectRepositories, decorationModel.getSkin());
+            Artifact skinArtifact =
+                    siteTool.getSkinArtifactFromRepository(repoSession, remoteProjectRepositories, siteModel.getSkin());
 
             getLog().info(buffer().a("Rendering content with ")
                     .strong(skinArtifact.getId() + " skin")
@@ -276,7 +277,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
                     .toString());
 
             context = siteRenderer.createContextForSkin(
-                    skinArtifact, templateProperties, decorationModel, project.getName(), locale);
+                    skinArtifact, templateProperties, siteModel, project.getName(), locale);
         } catch (SiteToolException e) {
             throw new MavenReportException("Failed to retrieve skin artifact", e);
         } catch (RendererException e) {

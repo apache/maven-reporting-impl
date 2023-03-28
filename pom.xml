@@ -59,7 +59,7 @@
     <javaVersion>8</javaVersion>
     <mavenVersion>3.2.5</mavenVersion>
     <doxiaVersion>2.0.0-M6</doxiaVersion>
-    <doxiaSitetoolsVersion>2.0.0-M6</doxiaSitetoolsVersion>
+    <doxiaSitetoolsVersion>2.0.0-M7</doxiaSitetoolsVersion>
     <reportingApiVersion>4.0.0-M5</reportingApiVersion>
     <pluginToolsVersion>3.8.1</pluginToolsVersion>
     <project.build.outputTimestamp>2023-03-19T20:35:30Z</project.build.outputTimestamp>
@@ -103,7 +103,7 @@
     <!-- Doxia site rendering -->
     <dependency>
       <groupId>org.apache.maven.doxia</groupId>
-      <artifactId>doxia-decoration-model</artifactId>
+      <artifactId>doxia-site-model</artifactId>
       <version>${doxiaSitetoolsVersion}</version>
     </dependency>
     <dependency>
