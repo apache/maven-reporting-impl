@@ -29,7 +29,7 @@
 
   <groupId>org.apache.maven.reporting</groupId>
   <artifactId>maven-reporting-impl</artifactId>
-  <version>4.0.0-M6</version>
+  <version>4.0.0-M7-SNAPSHOT</version>
 
   <name>Apache Maven Reporting Implementation</name>
   <description>Abstract classes to manage report generation.</description>
@@ -37,7 +37,7 @@
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven-reporting-impl.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven-reporting-impl.git</developerConnection>
-    <tag>maven-reporting-impl-4.0.0-M6</tag>
+    <tag>HEAD</tag>
     <url>https://github.com/apache/maven-reporting-impl/tree/${project.scm.tag}</url>
   </scm>
   <issueManagement>
@@ -62,7 +62,7 @@
     <doxiaSitetoolsVersion>2.0.0-M7</doxiaSitetoolsVersion>
     <reportingApiVersion>4.0.0-M5</reportingApiVersion>
     <pluginToolsVersion>3.8.1</pluginToolsVersion>
-    <project.build.outputTimestamp>2023-04-02T13:49:24Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2023-04-02T13:50:36Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
