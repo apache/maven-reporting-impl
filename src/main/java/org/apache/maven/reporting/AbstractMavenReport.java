@@ -229,6 +229,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
 
             SiteRendererSink sink = new SiteRendererSink(docRenderingContext);
 
+            // TODO Compared to Maven Site Plugin multipage reports will not work and fail with a NPE
             generate(sink, null, locale);
 
             if (!isExternalReport()) // MSHARED-204: only render Doxia sink if not an external report
