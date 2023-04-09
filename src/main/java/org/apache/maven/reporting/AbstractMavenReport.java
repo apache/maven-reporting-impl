@@ -42,6 +42,7 @@ import org.apache.maven.doxia.siterenderer.sink.SiteRendererSink;
 import org.apache.maven.doxia.tools.SiteTool;
 import org.apache.maven.doxia.tools.SiteToolException;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -85,6 +86,12 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
      */
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     protected MavenProject project;
+
+    /**
+     * The mojo execution
+     */
+    @Parameter(defaultValue = "${mojoExecution}", readonly = true, required = true)
+    protected MojoExecution mojoExecution;
 
     /**
      * The reactor projects.
@@ -223,9 +230,9 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
             // copy resources
             getSiteRenderer().copyResources(siteContext, outputDirectory);
 
-            // TODO Replace null with real value
+            String reportMojoInfo = mojoExecution.getPlugin().getId() + ":" + mojoExecution.getGoal();
             DocumentRenderingContext docRenderingContext =
-                    new DocumentRenderingContext(outputDirectory, filename, null);
+                    new DocumentRenderingContext(outputDirectory, getOutputName(), reportMojoInfo);
 
             SiteRendererSink sink = new SiteRendererSink(docRenderingContext);
 
