@@ -281,7 +281,6 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
 
             getLog().info(buffer().a("Rendering content with ")
                     .strong(skinArtifact.getId() + " skin")
-                    .a('.')
                     .toString());
 
             context = siteRenderer.createContextForSkin(
