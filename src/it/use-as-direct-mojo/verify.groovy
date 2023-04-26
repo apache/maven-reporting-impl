@@ -31,8 +31,7 @@ assert text.contains( '''\
 <div class="verbatim">
 <pre>Custom verbatim text.</pre></div>'''.normalize() );
 assert text.contains( '''\
-<div class="verbatim source">
-<pre>var custom_code = true;</pre></div>'''.normalize() );
+<div class="verbatim source"><pre class="prettyprint">var custom_code = true;</pre></div>'''.normalize() );
 
 f = new File( site, 'external/report.html' );
 assert f.exists();
