@@ -337,7 +337,7 @@ public abstract class AbstractMavenReportRenderer implements MavenReportRenderer
 
     /**
      * Convenience method to wrap a text in the current sink.
-     * <p>If text is empty or has a <code>null</code> value, add the <code>"-"</code> charater</p>
+     * <p>If text is empty or has a <code>null</code> value, add the <code>"-"</code> character</p>
      *
      * @param text a text, could be null.
      * @see Sink#text(String)
@@ -360,7 +360,7 @@ public abstract class AbstractMavenReportRenderer implements MavenReportRenderer
      * @see Sink#verbatim_()
      */
     protected void verbatimText(String text) {
-        sink.verbatim(null);
+        sink.verbatim();
 
         text(text);
 
@@ -381,7 +381,7 @@ public abstract class AbstractMavenReportRenderer implements MavenReportRenderer
         if (StringUtils.isEmpty(href)) {
             verbatimText(text);
         } else {
-            sink.verbatim(null);
+            sink.verbatim();
 
             link(href, text);
 
