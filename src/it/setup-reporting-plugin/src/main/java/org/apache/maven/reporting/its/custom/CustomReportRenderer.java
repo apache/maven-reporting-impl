@@ -38,7 +38,7 @@ public class CustomReportRenderer
         return "Custom Report Renderer Title";
     }
 
-    public void renderBody()
+    protected void renderBody()
     {
         startSection( "section" );
 
