@@ -343,7 +343,7 @@ public abstract class AbstractMavenReportRenderer implements MavenReportRenderer
      * @see Sink#text(String)
      */
     protected void text(String text) {
-        if (StringUtils.isEmpty(text)) // Take care of spaces
+        if (text == null || text.isEmpty()) // Take care of spaces
         {
             sink.text("-");
         } else {
@@ -378,7 +378,7 @@ public abstract class AbstractMavenReportRenderer implements MavenReportRenderer
      * @see Sink#verbatim_()
      */
     protected void verbatimLink(String text, String href) {
-        if (StringUtils.isEmpty(href)) {
+        if (href == null || href.isEmpty()) {
             verbatimText(text);
         } else {
             sink.verbatim();
@@ -426,7 +426,7 @@ public abstract class AbstractMavenReportRenderer implements MavenReportRenderer
      * @see #applyPattern(String)
      */
     public void linkPatternedText(String text) {
-        if (StringUtils.isEmpty(text)) {
+        if (text == null || text.isEmpty()) {
             text(text);
         } else {
             List<String> segments = applyPattern(text);
@@ -506,7 +506,7 @@ public abstract class AbstractMavenReportRenderer implements MavenReportRenderer
      * @return a map of text/href
      */
     private static List<String> applyPattern(String text) {
-        if (StringUtils.isEmpty(text)) {
+        if (text == null || text.isEmpty()) {
             return null;
         }
 
