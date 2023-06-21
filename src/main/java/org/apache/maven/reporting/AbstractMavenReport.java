@@ -327,12 +327,6 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
      */
     @Override
     public void generate(Sink sink, SinkFactory sinkFactory, Locale locale) throws MavenReportException {
-        if (!canGenerateReport()) {
-            getLog().info("This report cannot be generated as part of the current build. "
-                    + "The report name should be referenced in this line of output.");
-            return;
-        }
-
         this.sink = sink;
 
         this.sinkFactory = sinkFactory;
