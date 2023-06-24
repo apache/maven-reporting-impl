@@ -177,8 +177,12 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
      */
     @Override
     public void execute() throws MojoExecutionException {
-        if (!canGenerateReport()) {
-            return;
+        try {
+            if (!canGenerateReport()) {
+                return;
+            }
+        } catch (MavenReportException e) {
+            throw new MojoExecutionException("Failed to determine whether report can be generated", e);
         }
 
         if (outputFormat != null) {
@@ -429,7 +433,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     }
 
     @Override
-    public boolean canGenerateReport() {
+    public boolean canGenerateReport() throws MavenReportException {
         return true;
     }
 
