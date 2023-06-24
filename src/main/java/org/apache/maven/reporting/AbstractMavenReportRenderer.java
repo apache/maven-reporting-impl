@@ -80,7 +80,7 @@ public abstract class AbstractMavenReportRenderer implements MavenReportRenderer
 
     /** {@inheritDoc} */
     @Override
-    public void render() {
+    public void render() throws MavenReportException {
         sink.head();
 
         sink.title();
@@ -616,6 +616,7 @@ public abstract class AbstractMavenReportRenderer implements MavenReportRenderer
 
     /**
      * Renderer the body content of the report.
+     * @throws MavenReportException if any
      */
-    protected abstract void renderBody();
+    protected abstract void renderBody() throws MavenReportException;
 }
