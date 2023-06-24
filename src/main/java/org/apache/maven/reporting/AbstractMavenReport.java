@@ -328,11 +328,9 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     @Override
     public void generate(Sink sink, SinkFactory sinkFactory, Locale locale) throws MavenReportException {
         this.sink = sink;
-
         this.sinkFactory = sinkFactory;
 
         executeReport(locale);
-
         closeReport();
     }
 
