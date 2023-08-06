@@ -140,6 +140,14 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     protected String locale;
 
     /**
+     * Timestamp for reproducible output archive entries, either formatted as ISO 8601
+     * <code>yyyy-MM-dd'T'HH:mm:ssXXX</code> or as an int representing seconds since the epoch (like
+     * <a href="https://reproducible-builds.org/docs/source-date-epoch/">SOURCE_DATE_EPOCH</a>).
+     */
+    @Parameter(defaultValue = "${project.build.outputTimestamp}")
+    protected String outputTimestamp;
+
+    /**
      * SiteTool.
      */
     @Component
@@ -296,7 +304,6 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
         }
 
         // Add publish date
-        String outputTimestamp = getProject().getProperties().getProperty("project.build.outputTimestamp");
         MavenArchiver.parseBuildOutputTimestamp(outputTimestamp).ifPresent(v -> {
             context.setPublishDate(Date.from(v));
         });
