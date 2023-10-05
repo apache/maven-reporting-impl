@@ -30,7 +30,8 @@ under the License.
 
   <name>maven-reporting-impl IT: custom reporting plugin based on maven-reporting-impl</name>
   <description>
-    Demo to show how to write a reporting plugin based on maven-reporting-impl.
+    Demo to show how to write a reporting plugin based on maven-reporting-impl: 3 ways to write a report are provided = external (like javadoc), direct, and using a renderer.
+    The ITs will then test it works in the different situations that maven-reporting-impl supports: run as a goal or run as a site report.
   </description>
 
   <properties>
