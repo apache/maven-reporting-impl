@@ -179,12 +179,14 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
 
     /**
      * This method is called when the report generation is invoked directly as a standalone Mojo.
+     * This implementation is now marked {@code final} as it is not expected to be overridden:
+     * {@code maven-reporting-impl} provides all necessary plumbing.
      *
      * @throws MojoExecutionException if an error occurs when generating the report
      * @see org.apache.maven.plugin.Mojo#execute()
      */
     @Override
-    public void execute() throws MojoExecutionException {
+    public final void execute() throws MojoExecutionException {
         try {
             if (!canGenerateReport()) {
                 return;

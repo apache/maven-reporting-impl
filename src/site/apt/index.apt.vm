@@ -38,10 +38,13 @@ ${project.name}
 
   []
 
+  The two APIs implementations are provided by <<<{{{./apidocs/org/apache/maven/reporting/AbstractMavenReport.html}AbstractMavenReport}},
+  that delegates to extender's <<<executeReport( Locale )>>> reporting method implementation.
+
 * Usage
 
   A full working sample is included in <<<maven-reporting-impl>>> ITs, which are part of 
-  {{{../source-repository.html}the component source tree}}: see <<<src/it/setup-reporting-plugin>>>.
+  {{{../scm.html}the component source tree}}: see {{{https://github.com/apache/maven-reporting-impl/tree/${project.scm.tag}/src/it/setup-reporting-plugin}<<<src/it/setup-reporting-plugin>>>}}.
 
 * History
 
