@@ -74,9 +74,15 @@ import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
  */
 public abstract class AbstractMavenReport extends AbstractMojo implements MavenMultiPageReport {
     /**
-     * The output directory for the report. Note that this parameter is only evaluated if the goal is run directly from
-     * the command line. If the goal is run indirectly as part of a site generation, the output directory configured in
-     * the Maven Site Plugin is used instead.
+     * The shared output directory for the report. Note that this parameter is only evaluated if the goal is run
+     * directly from the command line. If the goal is run indirectly as part of a site generation, the shared
+     * output directory configured in the
+     * <a href="https://maven.apache.org/plugins/maven-site-plugin/site-mojo.html#outputDirectory">Maven Site Plugin</a>
+     * is used instead.
+     *<p>
+     * A plugin may use any subdirectory structure (either using a hard-coded name or, ideally, an additional
+     * user-defined mojo parameter with a default value) to generate multi-page reports or external reports with the
+     * main output file (entry point) denoted by {@link #getOutputName()}.
      */
     @Parameter(defaultValue = "${project.reporting.outputDirectory}", readonly = true, required = true)
     protected File outputDirectory;
@@ -165,7 +171,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     /** The sink factory to use */
     private SinkFactory sinkFactory;
 
-    /** The current report output directory to use */
+    /** The current shared report output directory to use */
     private File reportOutputDirectory;
 
     /**
