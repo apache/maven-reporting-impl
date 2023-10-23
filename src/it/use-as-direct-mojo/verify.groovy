@@ -17,7 +17,7 @@
  * under the License.
  */
 
-File outputDir = new File( basedir, 'target/site/' )
+File outputDir = new File( basedir, 'target/reports/' )
 
 File f = new File( outputDir, 'custom-report.html' );
 assert f.exists();

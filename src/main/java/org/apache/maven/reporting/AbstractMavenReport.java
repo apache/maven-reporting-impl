@@ -84,7 +84,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
      * user-defined mojo parameter with a default value) to generate multi-page reports or external reports with the
      * main output file (entry point) denoted by {@link #getOutputName()}.
      */
-    @Parameter(defaultValue = "${project.reporting.outputDirectory}", readonly = true, required = true)
+    @Parameter(defaultValue = "${project.build.directory}/reports", readonly = true, required = true)
     protected File outputDirectory;
 
     /**
