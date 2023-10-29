@@ -189,6 +189,8 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     public final void execute() throws MojoExecutionException {
         try {
             if (!canGenerateReport()) {
+                String reportMojoInfo = mojoExecution.getPlugin().getId() + ":" + mojoExecution.getGoal();
+                getLog().info("Skipping " + reportMojoInfo + " report goal");
                 return;
             }
         } catch (MavenReportException e) {
