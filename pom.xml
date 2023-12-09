@@ -61,7 +61,7 @@
     <doxiaVersion>2.0.0-M8</doxiaVersion>
     <doxiaSitetoolsVersion>2.0.0-M16</doxiaSitetoolsVersion>
     <reportingApiVersion>4.0.0-M9</reportingApiVersion>
-    <pluginToolsVersion>3.9.0</pluginToolsVersion>
+    <pluginToolsVersion>3.10.2</pluginToolsVersion>
     <project.build.outputTimestamp>2023-11-21T19:54:53Z</project.build.outputTimestamp>
   </properties>
 
@@ -146,7 +146,7 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-archiver</artifactId>
-      <version>3.6.0</version>
+      <version>3.6.1</version>
     </dependency>
 
     <!-- test -->
