@@ -38,14 +38,14 @@ public class ExternalReport
     extends AbstractMavenReport
 {
     /**
-     * The name of the destination directory inside the site.
+     * The name of the output directory inside the reports.
      */
-    @Parameter( property = "destDir", defaultValue = "external" )
-    private String destDir;
+    @Parameter( property = "outputDirName", defaultValue = "external" )
+    private String outputDirName;
 
     public String getOutputName()
     {
-        return destDir + "/report";
+        return outputDirName + "/report";
     }
 
     public String getName( Locale locale )
@@ -69,7 +69,7 @@ public class ExternalReport
     {
         try
         {
-            executeExternalTool( getOutputDirectory() + '/' + destDir );
+            executeExternalTool( new File( getReportOutputDirectory(), outputDirName ) );
         }
         catch ( IOException ioe )
         {
@@ -80,19 +80,17 @@ public class ExternalReport
     /**
      * Invoke the external tool to generate report.
      *
-     * @param destination destination directory
+     * @param destDir destination directory
      */
-    private void executeExternalTool( String destination )
+    private void executeExternalTool( File destDir )
         throws IOException
     {
-        getLog().info( "Running external tool to " + destination );
+        getLog().info( "Running external tool to " + destDir );
 
         // demo implementation, to be replaced with effective tool
-        File dest = new File( destination );
+        destDir.mkdirs();
 
-        dest.mkdirs();
-
-        File report = new File( dest, "report.html" );
-        FileUtils.fileWrite( report, "UTF-8", "<html><body><h1>External Report</h1></body></html>" );
+        File reportFile = new File( destDir, "report.html" );
+        FileUtils.fileWrite( reportFile, "UTF-8", "<html><body><h1>External Report</h1></body></html>" );
     }
 }

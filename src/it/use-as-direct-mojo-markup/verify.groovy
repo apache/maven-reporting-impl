@@ -17,17 +17,17 @@
  * under the License.
  */
 
-File site = new File( basedir, 'target/site/' )
+File outputDir = new File( basedir, 'target/site/' )
 
-File f = new File( site, 'custom-report.xdoc' );
+File f = new File( outputDir, 'custom-report.xdoc' );
 assert f.exists();
 assert f.text.contains( 'Custom Maven Report content.' );
 
-f = new File( site, 'custom-report-with-renderer.apt' );
+f = new File( outputDir, 'custom-report-with-renderer.apt' );
 assert f.exists();
 assert f.text.contains( 'Custom Maven Report with Renderer content.' );
 
-f = new File( site, 'external/report.html' );
+f = new File( outputDir, 'external/report.html' );
 assert f.exists();
 assert f.text.contains( '<h1>External Report</h1>' );
 
