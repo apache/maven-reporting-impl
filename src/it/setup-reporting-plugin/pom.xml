@@ -96,6 +96,9 @@ under the License.
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <goalPrefix>custom-reporting</goalPrefix>
+        </configuration>
       </plugin>
     </plugins>
   </build>
