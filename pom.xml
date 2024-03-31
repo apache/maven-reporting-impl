@@ -61,7 +61,7 @@
     <aetherVersion>1.0.0.v20140518</aetherVersion>
     <doxiaVersion>2.0.0-M8</doxiaVersion>
     <doxiaSitetoolsVersion>2.0.0-M16</doxiaSitetoolsVersion>
-    <reportingApiVersion>4.0.0-M9</reportingApiVersion>
+    <reportingApiVersion>4.0.0-M10</reportingApiVersion>
     <pluginToolsVersion>3.10.2</pluginToolsVersion>
     <project.build.outputTimestamp>2023-12-10T19:55:23Z</project.build.outputTimestamp>
   </properties>
