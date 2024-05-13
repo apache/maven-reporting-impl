@@ -58,7 +58,7 @@
   <properties>
     <javaVersion>8</javaVersion>
     <mavenVersion>3.6.3</mavenVersion>
-    <resolverVersion>1.4.1</resolverVersion>
+    <resolverVersion>1.9.20</resolverVersion>
     <doxiaVersion>2.0.0-M10</doxiaVersion>
     <doxiaSitetoolsVersion>2.0.0-M18</doxiaSitetoolsVersion>
     <reportingApiVersion>4.0.0-M11</reportingApiVersion>
