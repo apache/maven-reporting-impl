@@ -61,7 +61,7 @@
     <resolverVersion>1.4.1</resolverVersion>
     <doxiaVersion>2.0.0-M10</doxiaVersion>
     <doxiaSitetoolsVersion>2.0.0-M18</doxiaSitetoolsVersion>
-    <reportingApiVersion>4.0.0-M11</reportingApiVersion>
+    <reportingApiVersion>4.0.0-M12</reportingApiVersion>
     <pluginToolsVersion>3.12.0</pluginToolsVersion>
     <project.build.outputTimestamp>2024-04-26T14:46:18Z</project.build.outputTimestamp>
   </properties>
