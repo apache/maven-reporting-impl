@@ -27,11 +27,8 @@ f = new File( site, 'custom-report-with-renderer.html' );
 assert f.exists();
 text = f.text.normalize();
 assert text.contains( 'Custom Maven Report with Renderer content.' );
-assert text.contains( '''\
-<div class="verbatim">
-<pre>Custom verbatim text.</pre></div>'''.normalize() );
-assert text.contains( '''\
-<div class="verbatim source"><pre class="prettyprint">var custom_code = true;</pre></div>'''.normalize() );
+assert text.contains( '<pre>Custom verbatim text.</pre>' );
+assert text.contains( '<pre><code>var custom_code = true;</code></pre>' );
 
 f = new File( site, 'external/report.html' );
 assert f.exists();
