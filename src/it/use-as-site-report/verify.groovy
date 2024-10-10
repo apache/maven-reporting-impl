@@ -28,7 +28,7 @@ assert f.exists();
 text = f.text.normalize();
 assert text.contains( 'Custom Maven Report with Renderer content.' );
 assert text.contains( '<pre>Custom verbatim text.</pre>' );
-assert text.contains( '<pre><code>var custom_code = true;</code></pre>' );
+assert text.contains( '<pre class="prettyprint"><code>var custom_code = true;</code></pre>' );
 
 f = new File( site, 'external/report.html' );
 assert f.exists();
