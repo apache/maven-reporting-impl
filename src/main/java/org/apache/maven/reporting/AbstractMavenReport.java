@@ -143,7 +143,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
      * The locale to use when the report generation is invoked directly as a standalone Mojo.
      *
      * @see SiteTool#DEFAULT_LOCALE
-     * @see SiteTool#getSiteLocales
+     * @see SiteTool#getSiteLocales(String)
      */
     @Parameter(defaultValue = "default")
     protected String locale;
