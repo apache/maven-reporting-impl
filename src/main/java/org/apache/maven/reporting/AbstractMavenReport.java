@@ -18,6 +18,8 @@
  */
 package org.apache.maven.reporting;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -170,23 +172,20 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     @Parameter(property = "output.format")
     protected String outputFormat;
 
+    @Inject
     private PlexusContainer container;
 
     /**
      * SiteTool.
      */
+    @Inject
     protected SiteTool siteTool;
 
     /**
      * Doxia Site Renderer component.
      */
+    @Inject
     protected Renderer siteRenderer;
-
-    public AbstractMavenReport(PlexusContainer container, SiteTool siteTool, Renderer siteRenderer) {
-        this.container = container;
-        this.siteTool = siteTool;
-        this.siteRenderer = siteRenderer;
-    }
 
     /**
      * This method is called when the report generation is invoked directly as a standalone Mojo.
