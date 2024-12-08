@@ -18,6 +18,8 @@
  */
 package org.apache.maven.reporting;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -47,7 +49,6 @@ import org.apache.maven.model.Reporting;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.WriterFactory;
@@ -156,18 +157,6 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     @Parameter(defaultValue = "${project.build.outputTimestamp}")
     protected String outputTimestamp;
 
-    /**
-     * SiteTool.
-     */
-    @Component
-    protected SiteTool siteTool;
-
-    /**
-     * Doxia Site Renderer component.
-     */
-    @Component
-    protected Renderer siteRenderer;
-
     /** The current sink to use */
     private Sink sink;
 
@@ -183,8 +172,20 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     @Parameter(property = "output.format")
     protected String outputFormat;
 
-    @Component
+    @Inject
     private PlexusContainer container;
+
+    /**
+     * SiteTool.
+     */
+    @Inject
+    protected SiteTool siteTool;
+
+    /**
+     * Doxia Site Renderer component.
+     */
+    @Inject
+    protected Renderer siteRenderer;
 
     /**
      * This method is called when the report generation is invoked directly as a standalone Mojo.
