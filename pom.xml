@@ -53,8 +53,8 @@
     <tag>HEAD</tag>
   </scm>
   <issueManagement>
-    <system>jira</system>
-    <url>https://issues.apache.org/jira/issues/?jql=project%20%3D%20MSHARED%20AND%20component%20in%20(maven-reporting-impl)</url>
+    <system>GitHub Issues</system>
+    <url>https://github.com/apache/maven-reporting-impl/issues</url>
   </issueManagement>
   <ciManagement>
     <system>Jenkins</system>
