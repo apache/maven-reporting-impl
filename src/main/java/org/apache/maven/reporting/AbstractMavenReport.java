@@ -87,7 +87,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
      *<p>
      * A plugin may use any subdirectory structure (either using a hard-coded name or, ideally, an additional
      * user-defined mojo parameter with a default value) to generate multi-page reports or external reports with the
-     * main output file (entry point) denoted by {@link #getOutputName()}.
+     * main output file (entry point) denoted by {@link #getOutputPath}.
      */
     @Parameter(defaultValue = "${project.build.directory}/reports", required = true)
     protected File outputDirectory;
@@ -141,7 +141,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     protected File siteDirectory;
 
     /**
-     * The locale to use  when the report generation is invoked directly as a standalone Mojo.
+     * The locale to use when the report generation is invoked directly as a standalone Mojo.
      *
      * @see SiteTool#DEFAULT_LOCALE
      * @see SiteTool#getSiteLocales(String)
@@ -332,8 +332,8 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     /**
      * Generate a report.
      *
-     * @param sink the sink to use for the generation.
-     * @param locale the wanted locale to generate the report, could be null.
+     * @param sink the sink to use for the generation
+     * @param locale the wanted locale to generate the report, could be null
      * @throws MavenReportException if any
      * @deprecated use {@link #generate(Sink, SinkFactory, Locale)} instead.
      */
@@ -345,11 +345,6 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
 
     /**
      * This method is called when the report generation is invoked by maven-site-plugin.
-     *
-     * @param sink
-     * @param sinkFactory
-     * @param locale
-     * @throws MavenReportException
      */
     @Override
     public void generate(Sink sink, SinkFactory sinkFactory, Locale locale) throws MavenReportException {
@@ -414,7 +409,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     }
 
     /**
-     * Gets the locale
+     * Gets the locale.
      *
      * @return the locale for this standalone report
      */
