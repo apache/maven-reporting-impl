@@ -64,6 +64,8 @@
     <reportingApiVersion>4.0.0</reportingApiVersion>
     <pluginToolsVersion>3.15.0</pluginToolsVersion>
     <project.build.outputTimestamp>2024-10-12T19:43:07Z</project.build.outputTimestamp>
+
+    <version.maven-invoker-plugin>3.9.1</version.maven-invoker-plugin>
   </properties>
 
   <dependencies>
