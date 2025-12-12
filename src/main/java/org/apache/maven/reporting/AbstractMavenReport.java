@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -54,7 +55,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.WriterFactory;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.PathTool;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -215,14 +215,12 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     }
 
     private void reportToMarkup() throws MojoExecutionException {
-        String relativeOutput =
-                PathTool.getRelativeFilePath(String.valueOf(getProject().getBasedir()), getOutputDirectory());
+        Path relativeOutput = getProject().getBasedir().toPath().relativize(new File(getOutputDirectory()).toPath());
         if (isExternalReport()) {
-            getLog().info("Rendering external report to " + relativeOutput + File.separator + getOutputName());
+            getLog().info("Rendering external report to " + relativeOutput.resolve(getOutputName()));
         } else {
             String filename = getOutputName() + '.' + outputFormat;
-            getLog().info("Rendering report as " + outputFormat + " markup to " + relativeOutput + File.separator
-                    + filename);
+            getLog().info("Rendering report as " + outputFormat + " markup to " + relativeOutput.resolve(filename));
 
             try {
                 sinkFactory = container.lookup(SinkFactory.class, outputFormat);
@@ -251,12 +249,11 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     private void reportToSite() throws MojoExecutionException {
         String filename = getOutputName() + ".html";
 
-        String relativeOutput =
-                PathTool.getRelativeFilePath(String.valueOf(getProject().getBasedir()), getOutputDirectory());
+        Path relativeOutput = getProject().getBasedir().toPath().relativize(new File(getOutputDirectory()).toPath());
         if (isExternalReport()) {
-            getLog().info("Rendering external report to " + relativeOutput + File.separator + getOutputName());
+            getLog().info("Rendering external report to " + relativeOutput.resolve(getOutputName()));
         } else {
-            getLog().info("Rendering report to " + relativeOutput + File.separator + filename);
+            getLog().info("Rendering report to " + relativeOutput.resolve(filename));
         }
 
         File outputDirectory = new File(getOutputDirectory());
@@ -499,8 +496,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
         String constructedLocation = null;
         File xrefLocation = getXrefLocation(location, test);
 
-        String relativePath =
-                PathTool.getRelativePath(getReportOutputDirectory().getAbsolutePath(), xrefLocation.getAbsolutePath());
+        String relativePath = String.valueOf(getReportOutputDirectory().toPath().relativize(xrefLocation.toPath()));
         if (relativePath == null || relativePath.isEmpty()) {
             relativePath = ".";
         }
