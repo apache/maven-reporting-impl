@@ -215,14 +215,18 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     }
 
     private void reportToMarkup() throws MojoExecutionException {
-        getLog().info("Rendering to " + outputFormat + " markup");
-
-        if (!isExternalReport()) {
-            File outputDirectory = new File(getOutputDirectory());
+        String relativeOutput =
+                PathTool.getRelativeFilePath(String.valueOf(getProject().getBasedir()), getOutputDirectory());
+        if (isExternalReport()) {
+            getLog().info("Rendering external report to " + relativeOutput + File.separator + getOutputName());
+        } else {
             String filename = getOutputName() + '.' + outputFormat;
+            getLog().info("Rendering report as " + outputFormat + " markup to " + relativeOutput + File.separator
+                    + filename);
+
             try {
                 sinkFactory = container.lookup(SinkFactory.class, outputFormat);
-                sink = sinkFactory.createSink(outputDirectory, filename);
+                sink = sinkFactory.createSink(new File(getOutputDirectory()), filename);
             } catch (ComponentLookupException cle) {
                 throw new MojoExecutionException(
                         "Cannot find SinkFactory for Doxia output format: " + outputFormat, cle);
@@ -245,9 +249,17 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     }
 
     private void reportToSite() throws MojoExecutionException {
-        File outputDirectory = new File(getOutputDirectory());
-
         String filename = getOutputName() + ".html";
+
+        String relativeOutput =
+                PathTool.getRelativeFilePath(String.valueOf(getProject().getBasedir()), getOutputDirectory());
+        if (isExternalReport()) {
+            getLog().info("Rendering external report to " + relativeOutput + File.separator + getOutputName());
+        } else {
+            getLog().info("Rendering report to " + relativeOutput + File.separator + filename);
+        }
+
+        File outputDirectory = new File(getOutputDirectory());
 
         Locale locale = getLocale();
 
@@ -266,8 +278,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
             // TODO Compared to Maven Site Plugin multipage reports will not work and fail with an NPE
             generate(sink, null, locale);
 
-            if (!isExternalReport()) // MSHARED-204: only render Doxia sink if not an external report
-            {
+            if (!isExternalReport()) { // MSHARED-204: only render Doxia sink if not an external report
                 outputDirectory.mkdirs();
 
                 try (Writer writer = new OutputStreamWriter(
@@ -306,9 +317,11 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
             Artifact skinArtifact =
                     siteTool.getSkinArtifactFromRepository(repoSession, remoteProjectRepositories, siteModel.getSkin());
 
-            getLog().info(buffer().a("Rendering content with ")
-                    .strong(skinArtifact.getId() + " skin")
-                    .toString());
+            if (!isExternalReport()) {
+                getLog().info(buffer().a("          using ")
+                        .strong(skinArtifact.getId() + " site skin")
+                        .toString());
+            }
 
             context = siteRenderer.createContextForSkin(
                     skinArtifact, templateProperties, siteModel, project.getName(), locale);
