@@ -235,7 +235,16 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
 
         try {
             Locale locale = getLocale();
-            generate(sink, sinkFactory, locale);
+            generate(
+                    sink,
+                    new AbstractSinkFactoryAdapter(sinkFactory) {
+                        @Override
+                        public Sink createSink(File file, String filename) throws IOException {
+                            getLog().info("          " + relativeOutput.resolve(filename));
+                            return super.createSink(file, filename);
+                        }
+                    },
+                    locale);
         } catch (MavenReportException e) {
             throw new MojoExecutionException(
                     "An error has occurred in " + getName(Locale.ENGLISH) + " report generation.", e);
