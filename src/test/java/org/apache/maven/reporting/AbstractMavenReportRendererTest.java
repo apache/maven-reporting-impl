@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * Test case for some public method in AbstractMavenReportRenderer.
  */
-public class AbstractMavenReportRendererTest {
+class AbstractMavenReportRendererTest {
     private static List<String> applyPattern(String pattern) throws Throwable {
         try {
             Method method = AbstractMavenReportRenderer.class.getDeclaredMethod("applyPattern", String.class);
@@ -68,7 +68,7 @@ public class AbstractMavenReportRendererTest {
      * @throws Throwable if any
      */
     @Test
-    public void testApplyPattern() throws Throwable {
+    void applyPattern() throws Throwable {
         // the most simple test
         checkPattern("test {text,url}", new String[] {"test ", null, "text", "url"});
 
