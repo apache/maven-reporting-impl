@@ -31,4 +31,9 @@ f = new File( outputDir, 'external/report.html' );
 assert f.exists();
 assert f.text.contains( '<h1>External Report</h1>' );
 
+f = new File( outputDir, 'multi-page.xhtml' );
+assert f.exists();
+f = new File( outputDir, 'multi-second.html' );
+assert f.exists();
+
 return true;

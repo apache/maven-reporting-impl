@@ -34,4 +34,10 @@ f = new File( site, 'external/report.html' );
 assert f.exists();
 assert f.text.contains( '<h1>External Report</h1>' );
 
+f = new File( site, 'multi-page.html' );
+assert f.exists();
+f = new File( site, 'multi-second.html' );
+assert f.exists();
+
+
 return true;

@@ -34,4 +34,10 @@ f = new File( outputDir, 'external/report.html' );
 assert f.exists();
 assert f.text.contains( '<h1>External Report</h1>' );
 
+// https://github.com/apache/maven-reporting-impl/issues/217
+/*f = new File( outputDir, 'multi-page.html' );
+assert f.exists();
+f = new File( outputDir, 'multi-second.html' );
+assert f.exists();*/
+
 return true;
