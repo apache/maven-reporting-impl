@@ -217,9 +217,9 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     private void reportToMarkup() throws MojoExecutionException {
         Path relativeOutput = getProject().getBasedir().toPath().relativize(new File(getOutputDirectory()).toPath());
         if (isExternalReport()) {
-            getLog().info("Rendering external report to " + relativeOutput.resolve(getOutputName()));
+            getLog().info("Rendering external report to " + relativeOutput.resolve(getOutputPath()));
         } else {
-            String filename = getOutputName() + '.' + outputFormat;
+            String filename = getOutputPath() + '.' + outputFormat;
             getLog().info("Rendering report as " + outputFormat + " markup to " + relativeOutput.resolve(filename));
 
             try {
@@ -256,11 +256,11 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     }
 
     private void reportToSite() throws MojoExecutionException {
-        String filename = getOutputName() + ".html";
+        String filename = getOutputPath() + ".html";
 
         Path relativeOutput = getProject().getBasedir().toPath().relativize(new File(getOutputDirectory()).toPath());
         if (isExternalReport()) {
-            getLog().info("Rendering external report to " + relativeOutput.resolve(getOutputName()));
+            getLog().info("Rendering external report to " + relativeOutput.resolve(getOutputPath()));
         } else {
             getLog().info("Rendering report to " + relativeOutput.resolve(filename));
         }
@@ -277,7 +277,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
 
             String reportMojoInfo = mojoExecution.getPlugin().getId() + ":" + mojoExecution.getGoal();
             DocumentRenderingContext docRenderingContext =
-                    new DocumentRenderingContext(outputDirectory, getOutputName(), reportMojoInfo);
+                    new DocumentRenderingContext(outputDirectory, getOutputPath(), reportMojoInfo);
 
             SiteRendererSink sink = new SiteRendererSink(docRenderingContext);
 
