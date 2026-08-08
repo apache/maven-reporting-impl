@@ -21,14 +21,18 @@ package org.apache.maven.reporting;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.maven.doxia.sink.Sink;
+import org.apache.maven.doxia.sink.SinkEventAttributes;
+import org.apache.maven.doxia.sink.impl.SinkEventAttributeSet;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -166,5 +170,45 @@ class AbstractMavenReportRendererTest {
         renderer.render();
 
         assertEquals(2, verbatimCalls.get());
+    }
+
+    /**
+     * Same reasoning for {@code verbatimSource}, one level down: the attribute set has to be built rather than
+     * read off {@code SinkEventAttributeSet.SOURCE}, which is only there since Doxia 2. Asserting the identity
+     * rather than only the content is what makes this fail if the constant is used again, since the constant
+     * carries exactly the same attribute.
+     */
+    @Test
+    void verbatimSourceBuildsTheAttributeSetRatherThanReadingTheDoxia2Constant() {
+        List<SinkEventAttributes> verbatimAttributes = new ArrayList<>();
+        Sink sink = (Sink) Proxy.newProxyInstance(
+                getClass().getClassLoader(), new Class<?>[] {Sink.class}, (proxy, method, args) -> {
+                    if ("verbatim".equals(method.getName()) && method.getParameterCount() == 1) {
+                        verbatimAttributes.add((SinkEventAttributes) args[0]);
+                    }
+                    return null;
+                });
+
+        AbstractMavenReportRenderer renderer = new AbstractMavenReportRenderer(sink) {
+            @Override
+            public String getTitle() {
+                return "title";
+            }
+
+            @Override
+            protected void renderBody() {
+                verbatimSource("var code = true;");
+            }
+        };
+
+        renderer.render();
+
+        assertEquals(1, verbatimAttributes.size());
+        SinkEventAttributes attributes = verbatimAttributes.get(0);
+        assertEquals("source", attributes.getAttribute(SinkEventAttributes.DECORATION));
+        assertNotSame(
+                SinkEventAttributeSet.SOURCE,
+                attributes,
+                "SinkEventAttributeSet.SOURCE does not exist in Doxia 1 and must not be read");
     }
 }

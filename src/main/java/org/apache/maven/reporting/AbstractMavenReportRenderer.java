@@ -386,7 +386,11 @@ public abstract class AbstractMavenReportRenderer implements MavenReportRenderer
      * @see Sink#verbatim_()
      */
     protected void verbatimSource(String source) {
-        sink.verbatim(SinkEventAttributeSet.SOURCE);
+        // not SinkEventAttributeSet.SOURCE: that constant only exists since Doxia 2, where it replaced BOXED,
+        // and report plugins run against the Doxia the Maven Site Plugin provides, which may still be Doxia 1.
+        // Building the same attribute set by hand keeps this a plain verbatim block there instead of a
+        // NoSuchFieldError (MPIR issue 103 was the same problem one method over).
+        sink.verbatim(new SinkEventAttributeSet(SinkEventAttributes.DECORATION, "source"));
 
         text(source);
 
