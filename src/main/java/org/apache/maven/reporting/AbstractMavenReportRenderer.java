@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import org.apache.maven.doxia.markup.Markup;
 import org.apache.maven.doxia.sink.Sink;
+import org.apache.maven.doxia.sink.SinkEventAttributes;
 import org.apache.maven.doxia.sink.impl.SinkEventAttributeSet;
 import org.apache.maven.shared.utils.StringUtils;
 
@@ -343,7 +344,10 @@ public abstract class AbstractMavenReportRenderer implements MavenReportRenderer
      * @see Sink#verbatim_()
      */
     protected void verbatimText(String text) {
-        sink.verbatim();
+        // Sink.verbatim() only exists since Doxia 2, while report plugins always run against the Doxia
+        // provided by the Maven Site Plugin in use, which may still be Doxia 1. Only the attribute
+        // taking overload exists in both, so stick to it (MPIR issue 103).
+        sink.verbatim((SinkEventAttributes) null);
 
         text(text);
 
@@ -364,7 +368,8 @@ public abstract class AbstractMavenReportRenderer implements MavenReportRenderer
         if (href == null || href.isEmpty()) {
             verbatimText(text);
         } else {
-            sink.verbatim();
+            // see verbatimText(String) for why the attribute taking overload is used here
+            sink.verbatim((SinkEventAttributes) null);
 
             link(href, text);
 
