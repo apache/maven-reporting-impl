@@ -20,9 +20,12 @@ package org.apache.maven.reporting;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.maven.doxia.sink.Sink;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -124,5 +127,44 @@ class AbstractMavenReportRendererTest {
                     "Apache Software License, version 1.1",
                     "http://www.apache.org/licenses/LICENSE-1.1"
                 });
+    }
+
+    /**
+     * Report plugins always run against the Doxia provided by the Maven Site Plugin in use, which may still be
+     * Doxia 1, where {@code Sink.verbatim()} does not exist yet. A dynamic proxy is used instead of a
+     * {@code SinkAdapter} subclass because {@code AbstractSink.verbatim()} is final and delegates to the
+     * attribute taking overload, which would hide the distinction this test is about.
+     */
+    @Test
+    void verbatimOnlyUsesTheOverloadCommonToDoxia1And2() {
+        AtomicInteger verbatimCalls = new AtomicInteger();
+        Sink sink = (Sink) Proxy.newProxyInstance(
+                getClass().getClassLoader(), new Class<?>[] {Sink.class}, (proxy, method, args) -> {
+                    if ("verbatim".equals(method.getName())) {
+                        assertEquals(
+                                1,
+                                method.getParameterCount(),
+                                "Sink.verbatim() does not exist in Doxia 1 and must not be called");
+                        verbatimCalls.incrementAndGet();
+                    }
+                    return null;
+                });
+
+        AbstractMavenReportRenderer renderer = new AbstractMavenReportRenderer(sink) {
+            @Override
+            public String getTitle() {
+                return "title";
+            }
+
+            @Override
+            protected void renderBody() {
+                verbatimText("text");
+                verbatimLink("text", "https://maven.apache.org/");
+            }
+        };
+
+        renderer.render();
+
+        assertEquals(2, verbatimCalls.get());
     }
 }
