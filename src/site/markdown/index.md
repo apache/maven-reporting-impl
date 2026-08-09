@@ -1,79 +1,56 @@
- -----
- Introduction
- -----
- Hervé Boutemy
- -----
- 2014-12-07
- -----
+title: Introduction
+author: Hervé Boutemy
+date: 2014-12-07
 
- ~~ Licensed to the Apache Software Foundation (ASF) under one
- ~~ or more contributor license agreements.  See the NOTICE file
- ~~ distributed with this work for additional information
- ~~ regarding copyright ownership.  The ASF licenses this file
- ~~ to you under the Apache License, Version 2.0 (the
- ~~ "License"); you may not use this file except in compliance
- ~~ with the License.  You may obtain a copy of the License at
- ~~
- ~~   http://www.apache.org/licenses/LICENSE-2.0
- ~~
- ~~ Unless required by applicable law or agreed to in writing,
- ~~ software distributed under the License is distributed on an
- ~~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- ~~ KIND, either express or implied.  See the License for the
- ~~ specific language governing permissions and limitations
- ~~ under the License.
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
- ~~ NOTE: For help with the syntax of this file, see:
- ~~ http://maven.apache.org/doxia/references/apt-format.html
+http://www.apache.org/licenses/LICENSE-2.0
 
-${project.name}
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
 
-  Abstract classes to manage report generation, which can be run both:
-  
-  * as part of a site generation, as a {{{../maven-reporting-api/}maven-reporting-api}}'s
-  <<<{{{../maven-reporting-api/apidocs/org/apache/maven/reporting/MavenReport.html}MavenReport}}>>>,
+# Apache Maven Reporting Implementation
 
-  * or as a direct standalone goal invocation, as a {{{/ref/current/maven-plugin-api/}maven-plugin-api}}'s
-  <<<{{{/ref/current/maven-plugin-api/apidocs/org/apache/maven/plugin/Mojo.html}Mojo}}>>>.
+Abstract classes to manage report generation, which can be run both:
 
-  []
+- as part of a site generation, as a [maven-reporting-api](../maven-reporting-api/)'s [`MavenReport`](../maven-reporting-api/apidocs/org/apache/maven/reporting/MavenReport.html),
 
-* Usage
+- or as a direct standalone goal invocation, as a [maven-plugin-api](/ref/current/maven-plugin-api/)'s [`Mojo`](/ref/current/maven-plugin-api/apidocs/org/apache/maven/plugin/Mojo.html).
 
-  A full working sample is included in <<<maven-reporting-impl>>> ITs, which are part of 
-  {{{../source-repository.html}the component source tree}}: see <<<src/it/setup-reporting-plugin>>>.
+## Usage
 
-* History
+A full working sample is included in `maven-reporting-impl` ITs, which are part of [the component source tree](../source-repository.html): see `src/it/setup-reporting-plugin`.
 
-** Doxia runtime
+## History
 
-  When used as a direct standalone goal invocation, Doxia implementation used is the version used during plugin compilation.
+### Doxia runtime
 
-  When used as report during site generation, <<<maven-site-plugin>>> provides Doxia API implementation to the plugin, overriding
-  normal plugin dependency: see
-  {{{/shared/maven-reporting-exec/xref/org/apache/maven/reporting/exec/DefaultMavenReportExecutor.html}DefaultMavenReportExecutor}}
-  in <<<{{{/shared/maven-reporting-exec/}maven-reporting-exec}}>>>.
+When used as a direct standalone goal invocation, Doxia implementation used is the version used during plugin compilation.
 
-** Doxia dependency
+When used as report during site generation, `maven-site-plugin` provides Doxia API implementation to the plugin, overriding normal plugin dependency: see [DefaultMavenReportExecutor](/shared/maven-reporting-exec/xref/org/apache/maven/reporting/exec/DefaultMavenReportExecutor.html) in [`maven-reporting-exec`](/shared/maven-reporting-exec/).
 
-  From <<<maven-reporting-impl 2.1>>> to <<<maven-reporting-impl 2.3>>>, Doxia version used ranges from 1.1 to 1.4.
-  When creating a reporting plugin using one of these <<<maven-reporting-impl>>> versions,
-  take care to use corresponding <<<doxia-sink-api>>>:
+### Doxia dependency
 
-  * avoid <<<doxia-sink-api>>> version 1.0 that can be imported by <<<{{{../maven-reporting-api/}maven-reporting-api}}>>> 3.0:
-  this would lead to <<<"java.lang.ClassNotFoundException: org.apache.maven.doxia.sink.SinkEventAttributes">>> when used as
-  direct standalone goal.
+From `maven-reporting-impl 2.1` to `maven-reporting-impl 2.3`, Doxia version used ranges from 1.1 to 1.4. When creating a reporting plugin using one of these `maven-reporting-impl` versions, take care to use corresponding `doxia-sink-api`:
 
-  * avoid <<<doxia-sink-api>>> after 1.4 since RenderingContext was moved in Doxia 1.5 from core to Site Renderer (see
-  {{{https://issues.apache.org/jira/browse/DOXIA-499}DOXIA-499}}).
+- avoid `doxia-sink-api` version 1.0 that can be imported by [`maven-reporting-api`](../maven-reporting-api/) 3.0: this would lead to `"java.lang.ClassNotFoundException: org.apache.maven.doxia.sink.SinkEventAttributes"` when used as direct standalone goal.
 
-  []
+- avoid `doxia-sink-api` after 1.4 since RenderingContext was moved in Doxia 1.5 from core to Site Renderer (see [DOXIA-499](https://issues.apache.org/jira/browse/DOXIA-499)).
 
-  <<<maven-reporting-impl 2.4.x>>> use Doxia 1.6.
+`maven-reporting-impl 2.4.x` use Doxia 1.6.
 
-** Upgrading to <<<maven-reporting-impl 2.3+>>>
+### Upgrading to `maven-reporting-impl 2.3+`
 
-  When upgrading a reporting plugin from an old version of <<<maven-reporting-impl>>> to version 2.3 or more,
-  a lot of copy/pasted code can be removed by upgrading the plugin to
-  {{{/plugin-tools/maven-plugin-tools-annotations/}plugin-tools with Java 5 annotations}}:
-  see {{{https://issues.apache.org/jira/browse/MSHARED-347}MSHARED-347}} for more details.
+When upgrading a reporting plugin from an old version of `maven-reporting-impl` to version 2.3 or more, a lot of copy/pasted code can be removed by upgrading the plugin to [plugin-tools with Java 5 annotations](/plugin-tools/maven-plugin-tools-annotations/): see [MSHARED-347](https://issues.apache.org/jira/browse/MSHARED-347) for more details.
