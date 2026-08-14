@@ -353,6 +353,11 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     /**
      * The sink factory handed to {@link #generate(Sink, SinkFactory, Locale)}, mirroring what Maven Site Plugin
      * provides so that a multipage report behaves the same when its goal is invoked directly.
+     * <p>
+     * TODO This class and {@link MultiPageSubSink} are copied from the private nested classes of the same names in
+     * Maven Site Plugin's {@code org.apache.maven.plugins.site.render.ReportDocumentRenderer}. Keep the two in step
+     * until Doxia Sitetools exposes a single public copy, then delete these. See
+     * <a href="https://github.com/apache/maven-doxia-sitetools/issues/671">doxia-sitetools#671</a>.
      */
     private static class MultiPageSinkFactory implements SinkFactory {
         /**
