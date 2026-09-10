@@ -34,7 +34,16 @@ import org.apache.maven.reporting.MavenReportRenderer;
 public class MultiPageReport
     extends CustomReportWithRenderer
 {
+    /**
+     * @deprecated use {@link #getOutputPath()} instead
+     */
+    @Deprecated
     public String getOutputName()
+    {
+        return getOutputPath();
+    }
+
+    public String getOutputPath()
     {
         return "multi-page";
     }
