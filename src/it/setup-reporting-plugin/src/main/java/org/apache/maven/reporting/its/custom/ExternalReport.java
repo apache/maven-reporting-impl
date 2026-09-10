@@ -43,7 +43,16 @@ public class ExternalReport
     @Parameter( property = "outputDirName", defaultValue = "external" )
     private String outputDirName;
 
+    /**
+     * @deprecated use {@link #getOutputPath()} instead
+     */
+    @Deprecated
     public String getOutputName()
+    {
+        return getOutputPath();
+    }
+
+    public String getOutputPath()
     {
         return outputDirName + "/report";
     }

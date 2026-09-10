@@ -36,7 +36,16 @@ import org.apache.maven.reporting.MavenReportRenderer;
 public class CustomReportWithRenderer
     extends AbstractMavenReport
 {
+    /**
+     * @deprecated use {@link #getOutputPath()} instead
+     */
+    @Deprecated
     public String getOutputName()
+    {
+        return getOutputPath();
+    }
+
+    public String getOutputPath()
     {
         return "custom-report-with-renderer";
     }

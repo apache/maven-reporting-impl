@@ -33,7 +33,16 @@ import org.apache.maven.reporting.MavenReportException;
 public class CustomReport
     extends AbstractMavenReport
 {
+    /**
+     * @deprecated use {@link #getOutputPath()} instead
+     */
+    @Deprecated
     public String getOutputName()
+    {
+        return getOutputPath();
+    }
+
+    public String getOutputPath()
     {
         return "custom-report";
     }
