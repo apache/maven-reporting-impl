@@ -39,8 +39,8 @@ import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.SinkFactory;
 import org.apache.maven.doxia.site.SiteModel;
 import org.apache.maven.doxia.siterenderer.DocumentRenderingContext;
-import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.doxia.siterenderer.RendererException;
+import org.apache.maven.doxia.siterenderer.SiteRenderer;
 import org.apache.maven.doxia.siterenderer.SiteRenderingContext;
 import org.apache.maven.doxia.siterenderer.sink.SiteRendererSink;
 import org.apache.maven.doxia.tools.SiteTool;
@@ -185,7 +185,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
      * Doxia Site Renderer component.
      */
     @Inject
-    protected Renderer siteRenderer;
+    protected SiteRenderer siteRenderer;
 
     /**
      * This method is called when the report generation is invoked directly as a standalone Mojo.
@@ -405,7 +405,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
         return project;
     }
 
-    protected Renderer getSiteRenderer() {
+    protected SiteRenderer getSiteRenderer() {
         return siteRenderer;
     }
 
