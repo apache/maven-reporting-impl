@@ -25,6 +25,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Date;
@@ -45,6 +47,7 @@ import org.apache.maven.doxia.siterenderer.SiteRenderingContext;
 import org.apache.maven.doxia.siterenderer.sink.SiteRendererSink;
 import org.apache.maven.doxia.tools.SiteTool;
 import org.apache.maven.doxia.tools.SiteToolException;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.plugin.AbstractMojo;
@@ -52,10 +55,8 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.utils.WriterFactory;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.ReaderFactory;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
@@ -109,6 +110,12 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
      */
     @Parameter(defaultValue = "${reactorProjects}", required = true, readonly = true)
     protected List<MavenProject> reactorProjects;
+
+    /**
+     * The current Maven session.
+     */
+    @Parameter(defaultValue = "${session}", readonly = true, required = true)
+    protected MavenSession mavenSession;
 
     /**
      * Specifies the input encoding.
@@ -305,7 +312,13 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     private SiteRenderingContext createSiteRenderingContext(Locale locale)
             throws MavenReportException, IOException, SiteToolException {
         SiteModel siteModel = siteTool.getSiteModel(
-                siteDirectory, locale, project, reactorProjects, repoSession, remoteProjectRepositories);
+                siteDirectory,
+                locale,
+                mavenSession.getRequest(),
+                project,
+                reactorProjects,
+                repoSession,
+                remoteProjectRepositories);
 
         Map<String, Object> templateProperties = new HashMap<>();
         // We tell the skin that we are rendering in standalone mode
@@ -326,7 +339,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
             if (!isExternalReport()) {
                 getLog().info(buffer().a("          using ")
                         .strong(skinArtifact.getId() + " site skin")
-                        .toString());
+                        .build());
             }
 
             context = siteRenderer.createContextForSkin(
@@ -415,7 +428,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
      * @return The input files encoding, never <code>null</code>.
      */
     protected String getInputEncoding() {
-        return (inputEncoding == null) ? ReaderFactory.FILE_ENCODING : inputEncoding;
+        return (inputEncoding == null) ? Charset.defaultCharset().name() : inputEncoding;
     }
 
     /**
@@ -424,7 +437,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
      * @return The effective reporting output file encoding, never <code>null</code>.
      */
     protected String getOutputEncoding() {
-        return (outputEncoding == null) ? WriterFactory.UTF_8 : outputEncoding;
+        return (outputEncoding == null) ? StandardCharsets.UTF_8.name() : outputEncoding;
     }
 
     /**
