@@ -40,6 +40,9 @@ assert f.text.contains( 'Custom Maven Report with Renderer content.' );
 
 f = new File( outputDir, 'multi-second.html' );
 assert f.exists();
-assert f.text.contains( 'Custom Maven Report with Renderer content.' );
+text = f.text.normalize();
+assert text.contains( '<title>Second Page Title' );
+assert text.contains( 'Second page content.' );
+assert !text.contains( 'Custom Maven Report with Renderer content.' );
 
 return true;

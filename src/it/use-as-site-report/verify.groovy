@@ -36,8 +36,13 @@ assert f.text.contains( '<h1>External Report</h1>' );
 
 f = new File( site, 'multi-page.html' );
 assert f.exists();
+assert f.text.contains( 'Custom Maven Report with Renderer content.' );
+
 f = new File( site, 'multi-second.html' );
 assert f.exists();
-
+text = f.text.normalize();
+assert text.contains( '<title>Second Page Title' );
+assert text.contains( 'Second page content.' );
+assert !text.contains( 'Custom Maven Report with Renderer content.' );
 
 return true;
