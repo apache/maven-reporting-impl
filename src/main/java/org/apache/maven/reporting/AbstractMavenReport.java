@@ -23,9 +23,11 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -55,6 +57,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.WriterFactory;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.PathTool;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -280,9 +283,10 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
                     new DocumentRenderingContext(outputDirectory, getOutputPath(), reportMojoInfo);
 
             SiteRendererSink sink = new SiteRendererSink(docRenderingContext);
+            // sink factory, for multipage reports that need sub-sinks
+            MultiPageSinkFactory multiPageSinkFactory = new MultiPageSinkFactory(this, docRenderingContext);
 
-            // TODO Compared to Maven Site Plugin multipage reports will not work and fail with an NPE
-            generate(sink, null, locale);
+            generate(sink, multiPageSinkFactory, locale);
 
             if (!isExternalReport()) { // MSHARED-204: only render Doxia sink if not an external report
                 outputDirectory.mkdirs();
@@ -292,6 +296,27 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
                     // render report
                     getSiteRenderer().mergeDocumentIntoSite(writer, sink, siteContext);
                 }
+
+                // render the subpages that a multipage report may have created
+                for (MultiPageSubSink subSink : multiPageSinkFactory.sinks()) {
+                    File subOutputDirectory = subSink.getOutputDirectory();
+                    subOutputDirectory.mkdirs();
+
+                    // the directory comes from the report, so make sure it is absolute before relativizing it
+                    File subOutputFile = new File(subOutputDirectory, subSink.getOutputName());
+                    getLog().info("Rendering report to "
+                            + getProject()
+                                    .getBasedir()
+                                    .toPath()
+                                    .relativize(subOutputFile.toPath().toAbsolutePath()));
+
+                    try (Writer writer =
+                            new OutputStreamWriter(new FileOutputStream(subOutputFile), getOutputEncoding())) {
+                        getSiteRenderer().mergeDocumentIntoSite(writer, subSink, siteContext);
+                    } finally {
+                        subSink.close();
+                    }
+                }
             }
 
             // copy generated resources also
@@ -299,6 +324,100 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
         } catch (RendererException | IOException | MavenReportException | SiteToolException e) {
             throw new MojoExecutionException(
                     "An error has occurred in " + getName(Locale.ENGLISH) + " report generation.", e);
+        }
+    }
+
+    /**
+     * The sink factory handed to {@link #generate(Sink, SinkFactory, Locale)}, so that a multipage report behaves
+     * the same when its goal is invoked directly as when it is invoked by Maven Site Plugin.
+     * <p>
+     * TODO {@link MultiPageSubSink} and {@link MultiPageSinkFactory} are verbatim copies of the private nested
+     * classes of the same names in Maven Site Plugin's
+     * {@code org.apache.maven.plugins.site.render.ReportDocumentRenderer}. Delete both copies once Doxia Sitetools
+     * exposes them as public API, see
+     * <a href="https://github.com/apache/maven-doxia-sitetools/issues/671">doxia-sitetools#671</a>.
+     */
+    private static class MultiPageSubSink extends SiteRendererSink {
+        private File outputDirectory;
+
+        private String outputName;
+
+        MultiPageSubSink(File outputDirectory, String outputName, DocumentRenderingContext docRenderingContext) {
+            super(docRenderingContext);
+            this.outputName = outputName;
+            this.outputDirectory = outputDirectory;
+        }
+
+        public String getOutputName() {
+            return outputName;
+        }
+
+        public File getOutputDirectory() {
+            return outputDirectory;
+        }
+    }
+
+    private static class MultiPageSinkFactory implements SinkFactory {
+        /**
+         * The report that is (maybe) generating multiple pages
+         */
+        private MavenReport report;
+
+        /**
+         * The main DocumentRenderingContext, which is the base for the DocumentRenderingContext of subpages
+         */
+        private DocumentRenderingContext docRenderingContext;
+
+        /**
+         * List of sinks (subpages) associated to this report
+         */
+        private List<MultiPageSubSink> sinks = new ArrayList<>();
+
+        MultiPageSinkFactory(MavenReport report, DocumentRenderingContext docRenderingContext) {
+            this.report = report;
+            this.docRenderingContext = docRenderingContext;
+        }
+
+        @Override
+        public Sink createSink(File outputDirectory, String outputName) {
+            // Create a new document rendering context, similar to the main one, but with a different output name
+            String document = PathTool.getRelativeFilePath(
+                    report.getReportOutputDirectory().getPath(), new File(outputDirectory, outputName).getPath());
+            // Remove .html suffix since we know that we are in Site Renderer context
+            document = document.substring(0, document.lastIndexOf('.'));
+
+            DocumentRenderingContext subSinkContext = new DocumentRenderingContext(
+                    docRenderingContext.getBasedir(), document, docRenderingContext.getGenerator());
+
+            // Create a sink for this subpage, based on this new document rendering context
+            MultiPageSubSink sink = new MultiPageSubSink(outputDirectory, outputName, subSinkContext);
+
+            // Add it to the list of sinks associated to this report
+            sinks.add(sink);
+
+            return sink;
+        }
+
+        @Override
+        public Sink createSink(File outputDir, String outputName, String encoding) throws IOException {
+            throw new UnsupportedOperationException(
+                    "Only createSink(File, String) is supported by MultiPageSinkFactory. The encoding is always determined by the site rendering context.");
+        }
+
+        @Override
+        public Sink createSink(OutputStream out) throws IOException {
+            throw new UnsupportedOperationException(
+                    "Only createSink(File, String) is supported by MultiPageSinkFactory. OutputStream based sinks are not supported.");
+        }
+
+        @Override
+        public Sink createSink(OutputStream out, String encoding) throws IOException {
+            throw new UnsupportedOperationException(
+                    "Only createSink(File, String) is supported by MultiPageSinkFactory. OutputStream based sinks are not supported.");
+        }
+
+        public List<MultiPageSubSink> sinks() {
+            return sinks;
         }
     }
 
