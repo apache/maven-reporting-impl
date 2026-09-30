@@ -21,7 +21,7 @@ package org.apache.maven.reporting.its.custom;
 
 import java.util.Locale;
 
-import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.api.plugin.annotations.Mojo;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
 import org.apache.maven.reporting.MavenReportRenderer;

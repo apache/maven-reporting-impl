@@ -29,7 +29,7 @@
 
   <groupId>org.apache.maven.reporting</groupId>
   <artifactId>maven-reporting-impl</artifactId>
-  <version>4.1.0-SNAPSHOT</version>
+  <version>5.0.0-SNAPSHOT</version>
 
   <name>Apache Maven Reporting Implementation</name>
   <description>Abstract classes to manage report generation.</description>
@@ -56,13 +56,12 @@
   </distributionManagement>
 
   <properties>
-    <javaVersion>8</javaVersion>
-    <mavenVersion>3.10.0</mavenVersion>
-    <resolverVersion>1.4.1</resolverVersion>
+    <javaVersion>17</javaVersion>
+    <mavenVersion>4.0.0-rc-7</mavenVersion>
     <doxiaVersion>2.1.0</doxiaVersion>
     <doxiaSitetoolsVersion>2.1.0</doxiaSitetoolsVersion>
     <reportingApiVersion>4.0.0</reportingApiVersion>
-    <pluginToolsVersion>3.15.0</pluginToolsVersion>
+    <pluginToolsVersion>4.0.0-beta-1</pluginToolsVersion>
     <project.build.outputTimestamp>2024-10-12T19:43:07Z</project.build.outputTimestamp>
 
   </properties>
@@ -74,7 +73,26 @@
       <version>${reportingApiVersion}</version>
     </dependency>
 
-    <!-- Maven -->
+    <!-- Maven 4 API -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-core</artifactId>
+      <version>${mavenVersion}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-di</artifactId>
+      <version>${mavenVersion}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-model</artifactId>
+      <version>${mavenVersion}</version>
+      <scope>provided</scope>
+    </dependency>
+    <!-- Maven 3 API only for the Doxia site tools, see LegacyMavenBridge -->
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
@@ -86,23 +104,6 @@
       <artifactId>maven-artifact</artifactId>
       <version>${mavenVersion}</version>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-plugin-api</artifactId>
-      <version>${mavenVersion}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-model</artifactId>
-      <version>${mavenVersion}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-shared-utils</artifactId>
-      <version>3.5.0</version>
     </dependency>
 
     <!-- Doxia -->
@@ -144,32 +145,6 @@
       <artifactId>doxia-module-xdoc</artifactId>
       <version>${doxiaVersion}</version>
       <scope>runtime</scope>
-    </dependency>
-
-    <!-- misc -->
-    <dependency>
-      <groupId>org.apache.maven.plugin-tools</groupId>
-      <artifactId>maven-plugin-annotations</artifactId>
-      <version>${version.maven-plugin-tools}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-archiver</artifactId>
-      <version>3.6.6</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-api</artifactId>
-      <version>${resolverVersion}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.sisu</groupId>
-      <artifactId>org.eclipse.sisu.plexus</artifactId>
     </dependency>
 
     <!-- test -->

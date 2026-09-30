@@ -29,7 +29,6 @@ import org.apache.maven.doxia.markup.Markup;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.SinkEventAttributes;
 import org.apache.maven.doxia.sink.impl.SinkEventAttributeSet;
-import org.apache.maven.shared.utils.StringUtils;
 
 /**
  * <p>An abstract class to manage report generation, with many helper methods to ease the job: you just need to
@@ -582,7 +581,7 @@ public abstract class AbstractMavenReportRenderer implements MavenReportRenderer
             }
         }
 
-        if (!StringUtils.isEmpty(text.substring(lastOffset))) {
+        if (!text.substring(lastOffset).trim().isEmpty()) {
             segments.add(text.substring(lastOffset));
             segments.add(null);
         }
