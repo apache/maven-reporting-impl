@@ -65,7 +65,21 @@ public class MultiPageReport
 
         try {
             Sink second = getSinkFactory().createSink(outputDirectory, "multi-second.html");
-            MavenReportRenderer r = new CustomReportRenderer(second);
+            // render content that differs from the main page, so that a test can tell the two pages apart
+            MavenReportRenderer r = new CustomReportRenderer(second)
+            {
+                public String getTitle()
+                {
+                    return "Second Page Title";
+                }
+
+                protected void renderBody()
+                {
+                    startSection( "second section" );
+                    text( "Second page content." );
+                    endSection();
+                }
+            };
             r.render();
         } catch (IOException e) {
             throw new MavenReportException("Could not create sink", e);
