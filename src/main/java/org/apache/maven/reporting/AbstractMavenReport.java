@@ -18,24 +18,39 @@
  */
 package org.apache.maven.reporting;
 
-import javax.inject.Inject;
-
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
-import org.apache.maven.archiver.MavenArchiver;
+import org.apache.maven.api.MojoExecution;
+import org.apache.maven.api.Project;
+import org.apache.maven.api.Session;
+import org.apache.maven.api.di.Inject;
+import org.apache.maven.api.model.ReportPlugin;
+import org.apache.maven.api.model.Reporting;
+import org.apache.maven.api.plugin.Log;
+import org.apache.maven.api.plugin.Mojo;
+import org.apache.maven.api.plugin.MojoException;
+import org.apache.maven.api.plugin.annotations.Parameter;
+import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.SinkFactory;
@@ -47,38 +62,27 @@ import org.apache.maven.doxia.siterenderer.SiteRenderingContext;
 import org.apache.maven.doxia.siterenderer.sink.SiteRendererSink;
 import org.apache.maven.doxia.tools.SiteTool;
 import org.apache.maven.doxia.tools.SiteToolException;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.model.Reporting;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.repository.RemoteRepository;
-
-import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 /**
  * The basis for a Maven report which can be generated both as part of a site generation or
  * as a direct standalone goal invocation.
  * Both invocations are delegated to <code>abstract executeReport( Locale )</code> from:
  * <ul>
- * <li>Mojo's <code>execute()</code> method, see maven-plugin-api</li>
+ * <li>Mojo's <code>execute()</code> method, see maven-api-core</li>
  * <li>MavenMultiPageReport's <code>generate( Sink, SinkFactory, Locale )</code>, see maven-reporting-api</li>
  * </ul>
  *
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @since 2.0
- * @see #execute() <code>Mojo.execute()</code>, from maven-plugin-api
+ * @see #execute() <code>Mojo.execute()</code>, from maven-api-core
  * @see #generate(Sink, SinkFactory, Locale) <code>MavenMultiPageReport.generate( Sink, SinkFactory, Locale )</code>,
  *  from maven-reporting-api
  * @see #executeReport(Locale) <code>abstract executeReport( Locale )</code>
  */
-public abstract class AbstractMavenReport extends AbstractMojo implements MavenMultiPageReport {
+public abstract class AbstractMavenReport implements Mojo, MavenMultiPageReport {
     /**
      * The shared output directory for the report. Note that this parameter is only evaluated if the goal is run
      * directly from the command line. If the goal is run indirectly as part of a site generation, the shared
@@ -96,26 +100,26 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     /**
      * The Maven Project.
      */
-    @Parameter(defaultValue = "${project}", readonly = true, required = true)
-    protected MavenProject project;
+    @Inject
+    protected Project project;
 
     /**
-     * The mojo execution
+     * The Maven Session.
      */
-    @Parameter(defaultValue = "${mojoExecution}", readonly = true, required = true)
+    @Inject
+    protected Session session;
+
+    /**
+     * The mojo execution.
+     */
+    @Inject
     protected MojoExecution mojoExecution;
 
     /**
-     * The reactor projects.
+     * The mojo logger.
      */
-    @Parameter(defaultValue = "${reactorProjects}", required = true, readonly = true)
-    protected List<MavenProject> reactorProjects;
-
-    /**
-     * The current Maven session.
-     */
-    @Parameter(defaultValue = "${session}", readonly = true, required = true)
-    protected MavenSession mavenSession;
+    @Inject
+    protected Log log;
 
     /**
      * Specifies the input encoding.
@@ -128,18 +132,6 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
      */
     @Parameter(property = "outputEncoding", defaultValue = "${project.reporting.outputEncoding}", readonly = true)
     private String outputEncoding;
-
-    /**
-     * The repository system session.
-     */
-    @Parameter(defaultValue = "${repositorySystemSession}", readonly = true, required = true)
-    protected RepositorySystemSession repoSession;
-
-    /**
-     * Remote project repositories used for the project.
-     */
-    @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true, required = true)
-    protected List<RemoteRepository> remoteProjectRepositories;
 
     /**
      * Directory containing the <code>site.xml</code> file.
@@ -179,39 +171,30 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     @Parameter(property = "output.format")
     protected String outputFormat;
 
-    @Inject
-    private PlexusContainer container;
+    /** Doxia SiteTool, looked up lazily: the Maven 4 DI does not see Sisu/Plexus components. */
+    private SiteTool siteTool;
 
-    /**
-     * SiteTool.
-     */
-    @Inject
-    protected SiteTool siteTool;
-
-    /**
-     * Doxia Site Renderer component.
-     */
-    @Inject
-    protected SiteRenderer siteRenderer;
+    /** Doxia site renderer component, looked up lazily for the same reason. */
+    private SiteRenderer siteRenderer;
 
     /**
      * This method is called when the report generation is invoked directly as a standalone Mojo.
      * This implementation is now marked {@code final} as it is not expected to be overridden:
      * {@code maven-reporting-impl} provides all necessary plumbing.
      *
-     * @throws MojoExecutionException if an error occurs when generating the report
-     * @see org.apache.maven.plugin.Mojo#execute()
+     * @throws MojoException if an error occurs when generating the report
+     * @see org.apache.maven.api.plugin.Mojo#execute()
      */
     @Override
-    public final void execute() throws MojoExecutionException {
+    public final void execute() throws MojoException {
         try {
             if (!canGenerateReport()) {
-                String reportMojoInfo = mojoExecution.getPlugin().getId() + ":" + mojoExecution.getGoal();
+                String reportMojoInfo = mojoExecution.getPlugin().getModel().getId() + ":" + mojoExecution.getGoal();
                 getLog().info("Skipping " + reportMojoInfo + " report goal");
                 return;
             }
         } catch (MavenReportException e) {
-            throw new MojoExecutionException("Failed to determine whether report can be generated", e);
+            throw new MojoException("Failed to determine whether report can be generated", e);
         }
 
         if (outputFormat != null) {
@@ -221,8 +204,8 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
         }
     }
 
-    private void reportToMarkup() throws MojoExecutionException {
-        Path relativeOutput = getProject().getBasedir().toPath().relativize(new File(getOutputDirectory()).toPath());
+    private void reportToMarkup() throws MojoException {
+        Path relativeOutput = getProject().getBasedir().relativize(new File(getOutputDirectory()).toPath());
         if (isExternalReport()) {
             getLog().info("Rendering external report to " + relativeOutput.resolve(getOutputPath()));
         } else {
@@ -230,13 +213,12 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
             getLog().info("Rendering report as " + outputFormat + " markup to " + relativeOutput.resolve(filename));
 
             try {
-                sinkFactory = container.lookup(SinkFactory.class, outputFormat);
+                sinkFactory = lookupInPluginRealm(SinkFactory.class, outputFormat);
                 sink = sinkFactory.createSink(new File(getOutputDirectory()), filename);
-            } catch (ComponentLookupException cle) {
-                throw new MojoExecutionException(
-                        "Cannot find SinkFactory for Doxia output format: " + outputFormat, cle);
+            } catch (org.apache.maven.api.services.LookupException le) {
+                throw new MojoException("Cannot find SinkFactory for Doxia output format: " + outputFormat, le);
             } catch (IOException ioe) {
-                throw new MojoExecutionException("Cannot create sink to " + new File(outputDirectory, filename), ioe);
+                throw new MojoException("Cannot create sink to " + new File(outputDirectory, filename), ioe);
             }
         }
 
@@ -253,8 +235,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
                     },
                     locale);
         } catch (MavenReportException e) {
-            throw new MojoExecutionException(
-                    "An error has occurred in " + getName(Locale.ENGLISH) + " report generation.", e);
+            throw new MojoException("An error has occurred in " + getName(Locale.ENGLISH) + " report generation.", e);
         } finally {
             if (sink != null) {
                 sink.close();
@@ -262,10 +243,10 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
         }
     }
 
-    private void reportToSite() throws MojoExecutionException {
+    private void reportToSite() throws MojoException {
         String filename = getOutputPath() + ".html";
 
-        Path relativeOutput = getProject().getBasedir().toPath().relativize(new File(getOutputDirectory()).toPath());
+        Path relativeOutput = getProject().getBasedir().relativize(new File(getOutputDirectory()).toPath());
         if (isExternalReport()) {
             getLog().info("Rendering external report to " + relativeOutput.resolve(getOutputPath()));
         } else {
@@ -282,7 +263,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
             // copy resources
             getSiteRenderer().copyResources(siteContext, outputDirectory);
 
-            String reportMojoInfo = mojoExecution.getPlugin().getId() + ":" + mojoExecution.getGoal();
+            String reportMojoInfo = mojoExecution.getPlugin().getModel().getId() + ":" + mojoExecution.getGoal();
             DocumentRenderingContext docRenderingContext =
                     new DocumentRenderingContext(outputDirectory, getOutputPath(), reportMojoInfo);
 
@@ -292,10 +273,11 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
             generate(sink, null, locale);
 
             if (!isExternalReport()) { // MSHARED-204: only render Doxia sink if not an external report
-                outputDirectory.mkdirs();
+                Files.createDirectories(outputDirectory.toPath());
 
                 try (Writer writer = new OutputStreamWriter(
-                        new FileOutputStream(new File(outputDirectory, filename)), getOutputEncoding())) {
+                        Files.newOutputStream(outputDirectory.toPath().resolve(filename)),
+                        Charset.forName(getOutputEncoding()))) {
                     // render report
                     getSiteRenderer().mergeDocumentIntoSite(writer, sink, siteContext);
                 }
@@ -304,46 +286,59 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
             // copy generated resources also
             getSiteRenderer().copyResources(siteContext, outputDirectory);
         } catch (RendererException | IOException | MavenReportException | SiteToolException e) {
-            throw new MojoExecutionException(
-                    "An error has occurred in " + getName(Locale.ENGLISH) + " report generation.", e);
+            throw new MojoException("An error has occurred in " + getName(Locale.ENGLISH) + " report generation.", e);
         }
     }
 
     private SiteRenderingContext createSiteRenderingContext(Locale locale)
             throws MavenReportException, IOException, SiteToolException {
-        SiteModel siteModel = siteTool.getSiteModel(
-                siteDirectory,
-                locale,
-                mavenSession.getRequest(),
-                project,
-                reactorProjects,
-                repoSession,
-                remoteProjectRepositories);
+        // Doxia's SiteTool and SiteRenderer still speak the Maven 3 API (MavenProject, RepositorySystemSession, ...)
+        LegacyMavenBridge bridge = new LegacyMavenBridge(session, project);
+
+        SiteModel siteModel = getSiteTool()
+                .getSiteModel(
+                        siteDirectory,
+                        locale,
+                        bridge.getMavenProject(),
+                        bridge.getReactorProjects(),
+                        bridge.getRepositorySystemSession(),
+                        bridge.getRemoteProjectRepositories());
 
         Map<String, Object> templateProperties = new HashMap<>();
         // We tell the skin that we are rendering in standalone mode
         templateProperties.put("standalone", Boolean.TRUE);
-        templateProperties.put("project", getProject());
+        templateProperties.put("project", bridge.getMavenProject());
         templateProperties.put("inputEncoding", getInputEncoding());
         templateProperties.put("outputEncoding", getOutputEncoding());
         // Put any of the properties in directly into the Velocity context
-        for (Map.Entry<Object, Object> entry : getProject().getProperties().entrySet()) {
-            templateProperties.put((String) entry.getKey(), entry.getValue());
+        for (Map.Entry<String, String> entry :
+                getProject().getModel().getProperties().entrySet()) {
+            templateProperties.put(entry.getKey(), entry.getValue());
         }
 
         SiteRenderingContext context;
         try {
-            Artifact skinArtifact =
-                    siteTool.getSkinArtifactFromRepository(repoSession, remoteProjectRepositories, siteModel.getSkin());
+            Artifact skinArtifact = getSiteTool()
+                    .getSkinArtifactFromRepository(
+                            bridge.getRepositorySystemSession(),
+                            bridge.getRemoteProjectRepositories(),
+                            siteModel.getSkin());
 
             if (!isExternalReport()) {
-                getLog().info(buffer().a("          using ")
+                getLog().info(session.getService(MessageBuilderFactory.class)
+                        .builder()
+                        .a("          using ")
                         .strong(skinArtifact.getId() + " site skin")
                         .build());
             }
 
-            context = siteRenderer.createContextForSkin(
-                    skinArtifact, templateProperties, siteModel, project.getName(), locale);
+            context = getSiteRenderer()
+                    .createContextForSkin(
+                            skinArtifact,
+                            templateProperties,
+                            siteModel,
+                            project.getModel().getName(),
+                            locale);
         } catch (SiteToolException e) {
             throw new MavenReportException("Failed to retrieve skin artifact", e);
         } catch (RendererException e) {
@@ -351,14 +346,43 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
         }
 
         // Add publish date
-        MavenArchiver.parseBuildOutputTimestamp(outputTimestamp).ifPresent(v -> {
+        parseBuildOutputTimestamp(outputTimestamp).ifPresent(v -> {
             context.setPublishDate(Date.from(v));
         });
 
         // Generate static site
-        context.setRootDirectory(project.getBasedir());
+        context.setRootDirectory(project.getBasedir().toFile());
 
         return context;
+    }
+
+    /**
+     * Parses {@code project.build.outputTimestamp} the way maven-archiver does: ISO 8601, seconds since the epoch,
+     * or the {@code SOURCE_DATE_EPOCH} environment variable as fallback.
+     */
+    private static Optional<Instant> parseBuildOutputTimestamp(String outputTimestamp) {
+        if (outputTimestamp == null || (outputTimestamp.length() < 2 && !isNumeric(outputTimestamp))) {
+            outputTimestamp = System.getenv("SOURCE_DATE_EPOCH");
+            if (outputTimestamp == null) {
+                return Optional.empty();
+            }
+        }
+        if (isNumeric(outputTimestamp)) {
+            return Optional.of(Instant.ofEpochSecond(Long.parseLong(outputTimestamp)));
+        }
+        try {
+            return Optional.of(OffsetDateTime.parse(outputTimestamp)
+                    .withOffsetSameInstant(ZoneOffset.UTC)
+                    .truncatedTo(ChronoUnit.SECONDS)
+                    .toInstant());
+        } catch (DateTimeParseException pe) {
+            throw new IllegalArgumentException(
+                    "Invalid project.build.outputTimestamp value '" + outputTimestamp + "'", pe);
+        }
+    }
+
+    private static boolean isNumeric(String str) {
+        return !str.isEmpty() && str.chars().allMatch(c -> c >= '0' && c <= '9');
     }
 
     /**
@@ -414,12 +438,62 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
         return outputDirectory.getAbsolutePath();
     }
 
-    protected MavenProject getProject() {
+    protected Project getProject() {
         return project;
     }
 
+    /**
+     * Gets the mojo logger.
+     *
+     * @return the logger, never <code>null</code>
+     */
+    protected Log getLog() {
+        return log;
+    }
+
+    /**
+     * Gets the projects of the current reactor.
+     *
+     * @return the reactor projects
+     */
+    protected List<Project> getReactorProjects() {
+        return session.getProjects();
+    }
+
     protected SiteRenderer getSiteRenderer() {
+        if (siteRenderer == null) {
+            siteRenderer = lookupInPluginRealm(SiteRenderer.class, null);
+        }
         return siteRenderer;
+    }
+
+    /**
+     * Looks up a Doxia component (a Sisu/Plexus component living in the plugin realm) which the Maven 4 DI and
+     * {@link Lookup} cannot see from a Maven 4 mojo unless the lookup realm is switched to the plugin realm.
+     */
+    private <T> T lookupInPluginRealm(Class<T> type, String hint) {
+        PlexusContainer container = new LegacyMavenBridge(session, project).getPlexusContainer();
+        ClassRealm previous = container.getLookupRealm();
+        try {
+            container.setLookupRealm((ClassRealm) mojoExecution.getPlugin().getClassLoader());
+            return hint == null ? container.lookup(type) : container.lookup(type, hint);
+        } catch (ComponentLookupException e) {
+            throw new org.apache.maven.api.services.LookupException(e);
+        } finally {
+            container.setLookupRealm(previous);
+        }
+    }
+
+    /**
+     * Gets the Doxia site tool.
+     *
+     * @return the site tool
+     */
+    protected SiteTool getSiteTool() {
+        if (siteTool == null) {
+            siteTool = lookupInPluginRealm(SiteTool.class, null);
+        }
+        return siteTool;
     }
 
     /**
@@ -446,7 +520,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
      * @return the locale for this standalone report
      */
     protected Locale getLocale() {
-        return siteTool.getSiteLocales(locale).get(0);
+        return getSiteTool().getSiteLocales(locale).get(0);
     }
 
     /**

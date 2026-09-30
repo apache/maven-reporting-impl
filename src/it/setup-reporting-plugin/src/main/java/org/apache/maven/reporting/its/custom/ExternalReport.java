@@ -20,14 +20,15 @@ package org.apache.maven.reporting.its.custom;
  */
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.io.File;
 import java.util.Locale;
 
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.api.plugin.annotations.Mojo;
+import org.apache.maven.api.plugin.annotations.Parameter;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
-import org.apache.maven.shared.utils.io.FileUtils;
 
 /**
  * Typical code to copy as an external reporting plugin start: choose the goal name, then implement getOutputName(),
@@ -100,6 +101,6 @@ public class ExternalReport
         destDir.mkdirs();
 
         File reportFile = new File( destDir, "report.html" );
-        FileUtils.fileWrite( reportFile, "UTF-8", "<html><body><h1>External Report</h1></body></html>" );
+        Files.write( reportFile.toPath(), "<html><body><h1>External Report</h1></body></html>".getBytes( StandardCharsets.UTF_8 ) );
     }
 }
