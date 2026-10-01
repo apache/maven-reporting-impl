@@ -107,7 +107,10 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
 
     /**
      * The reactor projects.
+     *
+     * @deprecated use {@link #getReactorProjects()} instead; this field is removed in the Maven 4 API line.
      */
+    @Deprecated
     @Parameter(defaultValue = "${reactorProjects}", required = true, readonly = true)
     protected List<MavenProject> reactorProjects;
 
@@ -131,13 +134,19 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
 
     /**
      * The repository system session.
+     *
+     * @deprecated use {@link #getRepoSession()} instead; this field is removed in the Maven 4 API line.
      */
+    @Deprecated
     @Parameter(defaultValue = "${repositorySystemSession}", readonly = true, required = true)
     protected RepositorySystemSession repoSession;
 
     /**
      * Remote project repositories used for the project.
+     *
+     * @deprecated use {@link #getRemoteProjectRepositories()} instead; this field is removed in the Maven 4 API line.
      */
+    @Deprecated
     @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true, required = true)
     protected List<RemoteRepository> remoteProjectRepositories;
 
@@ -184,13 +193,19 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
 
     /**
      * SiteTool.
+     *
+     * @deprecated use {@link #getSiteTool()} instead; this field is removed in the Maven 4 API line.
      */
+    @Deprecated
     @Inject
     protected SiteTool siteTool;
 
     /**
      * Doxia Site Renderer component.
+     *
+     * @deprecated use {@link #getSiteRenderer()} instead; this field is removed in the Maven 4 API line.
      */
+    @Deprecated
     @Inject
     protected SiteRenderer siteRenderer;
 
@@ -311,14 +326,15 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
 
     private SiteRenderingContext createSiteRenderingContext(Locale locale)
             throws MavenReportException, IOException, SiteToolException {
-        SiteModel siteModel = siteTool.getSiteModel(
-                siteDirectory,
-                locale,
-                mavenSession.getRequest(),
-                project,
-                reactorProjects,
-                repoSession,
-                remoteProjectRepositories);
+        SiteModel siteModel = getSiteTool()
+                .getSiteModel(
+                        siteDirectory,
+                        locale,
+                        mavenSession.getRequest(),
+                        project,
+                        getReactorProjects(),
+                        getRepoSession(),
+                        getRemoteProjectRepositories());
 
         Map<String, Object> templateProperties = new HashMap<>();
         // We tell the skin that we are rendering in standalone mode
@@ -333,8 +349,9 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
 
         SiteRenderingContext context;
         try {
-            Artifact skinArtifact =
-                    siteTool.getSkinArtifactFromRepository(repoSession, remoteProjectRepositories, siteModel.getSkin());
+            Artifact skinArtifact = getSiteTool()
+                    .getSkinArtifactFromRepository(
+                            getRepoSession(), getRemoteProjectRepositories(), siteModel.getSkin());
 
             if (!isExternalReport()) {
                 getLog().info(buffer().a("          using ")
@@ -342,8 +359,8 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
                         .build());
             }
 
-            context = siteRenderer.createContextForSkin(
-                    skinArtifact, templateProperties, siteModel, project.getName(), locale);
+            context = getSiteRenderer()
+                    .createContextForSkin(skinArtifact, templateProperties, siteModel, project.getName(), locale);
         } catch (SiteToolException e) {
             throw new MavenReportException("Failed to retrieve skin artifact", e);
         } catch (RendererException e) {
@@ -418,8 +435,53 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
         return project;
     }
 
+    /**
+     * Gets the Doxia Site Renderer component.
+     *
+     * @return the site renderer
+     */
     protected SiteRenderer getSiteRenderer() {
         return siteRenderer;
+    }
+
+    /**
+     * Gets the site tool.
+     *
+     * @return the site tool
+     * @since 4.1.0
+     */
+    protected SiteTool getSiteTool() {
+        return siteTool;
+    }
+
+    /**
+     * Gets the reactor projects.
+     *
+     * @return the reactor projects
+     * @since 4.1.0
+     */
+    protected List<MavenProject> getReactorProjects() {
+        return reactorProjects;
+    }
+
+    /**
+     * Gets the repository system session.
+     *
+     * @return the repository system session
+     * @since 4.1.0
+     */
+    protected RepositorySystemSession getRepoSession() {
+        return repoSession;
+    }
+
+    /**
+     * Gets the remote project repositories used for the project.
+     *
+     * @return the remote project repositories
+     * @since 4.1.0
+     */
+    protected List<RemoteRepository> getRemoteProjectRepositories() {
+        return remoteProjectRepositories;
     }
 
     /**
@@ -446,7 +508,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
      * @return the locale for this standalone report
      */
     protected Locale getLocale() {
-        return siteTool.getSiteLocales(locale).get(0);
+        return getSiteTool().getSiteLocales(locale).get(0);
     }
 
     /**
