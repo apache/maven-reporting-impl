@@ -144,7 +144,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     /**
      * Directory containing the <code>site.xml</code> file.
      */
-    @Parameter(defaultValue = "${basedir}/src/site")
+    @Parameter(defaultValue = "${project.basedir}/src/site")
     protected File siteDirectory;
 
     /**
