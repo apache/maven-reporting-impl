@@ -23,7 +23,7 @@ import java.util.Locale;
 
 import java.io.IOException;
 import org.apache.maven.doxia.sink.Sink;
-import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.api.plugin.annotations.Mojo;
 import org.apache.maven.reporting.MavenReportException;
 import org.apache.maven.reporting.MavenReportRenderer;
 
