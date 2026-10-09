@@ -216,20 +216,4 @@
     </plugins>
   </build>
 
-  <profiles>
-    <profile>
-      <id>reporting</id>
-      <reporting>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>clirr-maven-plugin</artifactId>
-            <configuration>
-              <comparisonVersion>2.0.4.1</comparisonVersion>
-            </configuration>
-          </plugin>
-        </plugins>
-      </reporting>
-    </profile>
-  </profiles>
 </project>
