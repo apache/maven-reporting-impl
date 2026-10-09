@@ -57,8 +57,6 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.PathTool;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -170,6 +168,13 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
     /** The current sink to use */
     private Sink sink;
 
+    /**
+     * All available sink factories, keyed by their name (e.g. "fml", "xdoc", "xml", "html", "pdf", ...).
+     * This is used to look up the sink factory to use for the configured output format.
+     */
+    @Inject
+    private Map<String, SinkFactory> sinkFactoryMap;
+
     /** The sink factory to use */
     private SinkFactory sinkFactory;
 
@@ -181,9 +186,6 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
      */
     @Parameter(property = "output.format")
     protected String outputFormat;
-
-    @Inject
-    private PlexusContainer container;
 
     /**
      * SiteTool.
@@ -233,11 +235,12 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MavenM
             getLog().info("Rendering report as " + outputFormat + " markup to " + relativeOutput.resolve(filename));
 
             try {
-                sinkFactory = container.lookup(SinkFactory.class, outputFormat);
+                sinkFactory = sinkFactoryMap.get(outputFormat);
+                if (sinkFactory == null) {
+                    throw new MojoExecutionException(
+                            "Cannot find SinkFactory for Doxia output format: " + outputFormat);
+                }
                 sink = sinkFactory.createSink(new File(getOutputDirectory()), filename);
-            } catch (ComponentLookupException cle) {
-                throw new MojoExecutionException(
-                        "Cannot find SinkFactory for Doxia output format: " + outputFormat, cle);
             } catch (IOException ioe) {
                 throw new MojoExecutionException("Cannot create sink to " + new File(outputDirectory, filename), ioe);
             }
