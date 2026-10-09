@@ -39,3 +39,36 @@ notifications:
   commits: commits@maven.apache.org
   issues: issues@maven.apache.org
   pullrequests: issues@maven.apache.org
+
+# https://releases.apache.org/projects/maven-reporting-impl
+project:
+  metadata:
+    key: maven-reporting-impl
+    committee: maven
+    name: Apache Maven Reporting Impl
+    description: Abstract classes to manage report generation.
+    homepage: https://maven.apache.org/shared/maven-reporting-impl/
+    download_page: https://maven.apache.org/shared/maven-reporting-impl/download.cgi
+    bug_database: https://maven.apache.org/shared/maven-reporting-impl/issue-management.html
+    mailing_lists: https://maven.apache.org/shared/maven-reporting-impl/mailing-lists.html
+    repositories:
+      - https://github.com/apache/maven-reporting-impl
+    categories:
+      - build-management
+    programming_languages:
+      - java
+  policy:
+    announce_release_template_url: https://maven.apache.org/atr/templates/announce_release_template.txt
+    start_vote_template_url: https://maven.apache.org/atr/templates/start_vote_template.txt
+    finish_vote_template_url: https://maven.apache.org/atr/templates/finish_vote_template.txt
+    github_repository_name: maven-reporting-impl
+    download_path_suffix: reporting
+    vote_recipients:
+      to: dev@maven.apache.org
+    announce_recipients:
+      to: announce@maven.apache.org
+      cc:
+        - dev@maven.apache.org
+        - users@maven.apache.org
+  features:
+    atr_sync: true
