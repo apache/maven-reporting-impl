@@ -60,7 +60,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
-      <version>@pluginToolsVersion@</version>
+      <version>@version.maven-plugin-tools@</version>
       <scope>provided</scope>
     </dependency>
 
@@ -84,12 +84,8 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
-        <version>@pluginToolsVersion@</version>
+        <version>@version.maven-plugin-tools@</version>
         <executions>
-          <execution>
-            <id>default-descriptor</id>
-            <phase>process-classes</phase>
-          </execution>
           <execution>
             <id>generated-helpmojo</id>
             <goals>
