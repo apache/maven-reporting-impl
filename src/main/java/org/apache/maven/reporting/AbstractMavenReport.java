@@ -69,17 +69,17 @@ import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
  * Both invocations are delegated to <code>abstract executeReport( Locale )</code> from:
  * <ul>
  * <li>Mojo's <code>execute()</code> method, see maven-plugin-api</li>
- * <li>MavenMultiPageReport's <code>generate( Sink, SinkFactory, Locale )</code>, see maven-reporting-api</li>
+ * <li>MavenReport's <code>generate( Sink, SinkFactory, Locale )</code>, see maven-reporting-api</li>
  * </ul>
  *
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @since 2.0
  * @see #execute() <code>Mojo.execute()</code>, from maven-plugin-api
- * @see #generate(Sink, SinkFactory, Locale) <code>MavenMultiPageReport.generate( Sink, SinkFactory, Locale )</code>,
+ * @see #generate(Sink, SinkFactory, Locale) <code>MavenReport.generate( Sink, SinkFactory, Locale )</code>,
  *  from maven-reporting-api
  * @see #executeReport(Locale) <code>abstract executeReport( Locale )</code>
  */
-public abstract class AbstractMavenReport extends AbstractMojo implements MavenMultiPageReport {
+public abstract class AbstractMavenReport extends AbstractMojo implements MultiPageReportCompat {
     /**
      * The shared output directory for the report. Note that this parameter is only evaluated if the goal is run
      * directly from the command line. If the goal is run indirectly as part of a site generation, the shared
