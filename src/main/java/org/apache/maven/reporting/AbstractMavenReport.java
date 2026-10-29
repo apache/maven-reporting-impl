@@ -89,7 +89,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MultiP
      *<p>
      * A plugin may use any subdirectory structure (either using a hard-coded name or, ideally, an additional
      * user-defined mojo parameter with a default value) to generate multi-page reports or external reports with the
-     * main output file (entry point) denoted by {@link #getOutputPath}.
+     * main output file (entry point) denoted by {@code getOutputPath()}.
      */
     @Parameter(defaultValue = "${project.build.directory}/reports", required = true)
     protected File outputDirectory;
@@ -150,9 +150,8 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MultiP
 
     /**
      * The locale to use when the report generation is invoked directly as a standalone Mojo.
-     *
-     * @see SiteTool#DEFAULT_LOCALE
-     * @see SiteTool#getSiteLocales(String)
+     * The value is parsed like a locale of the Maven Site Plugin's {@code locales} parameter
+     * ({@code SiteTool.getSiteLocales(String)}); {@code default} means {@code SiteTool.DEFAULT_LOCALE}.
      */
     @Parameter(defaultValue = "default")
     protected String locale;
