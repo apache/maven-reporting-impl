@@ -63,12 +63,6 @@ under the License.
       <version>@version.maven-plugin-tools@</version>
       <scope>provided</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-shared-utils</artifactId>
-      <version>3.4.2</version>
-    </dependency>
   </dependencies>
 
   <build>
