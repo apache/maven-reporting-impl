@@ -549,7 +549,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MultiP
      * @return The input files encoding, never <code>null</code>.
      */
     protected String getInputEncoding() {
-        return (inputEncoding == null) ? Charset.defaultCharset().name() : inputEncoding;
+        return inputEncoding == null ? Charset.defaultCharset().name() : inputEncoding;
     }
 
     /**
@@ -558,7 +558,7 @@ public abstract class AbstractMavenReport extends AbstractMojo implements MultiP
      * @return The effective reporting output file encoding, never <code>null</code>.
      */
     protected String getOutputEncoding() {
-        return (outputEncoding == null) ? StandardCharsets.UTF_8.name() : outputEncoding;
+        return outputEncoding == null ? StandardCharsets.UTF_8.name() : outputEncoding;
     }
 
     /**
