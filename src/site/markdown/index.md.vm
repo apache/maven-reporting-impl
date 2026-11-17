@@ -26,38 +26,60 @@ under the License.
 
 # ${project.name}
 
-Abstract classes to manage report generation, which can be run both:
+Maven Reporting Implementation provides
+[`AbstractMavenReport`](./apidocs/org/apache/maven/reporting/AbstractMavenReport.html), the base class for report
+plugins. A report that extends it runs in two ways:
 
-1\. as part of a **site generation**, as a [maven-reporting-api](../maven-reporting-api/)'s [`MavenReport`](../maven-reporting-api/apidocs/org/apache/maven/reporting/MavenReport.html),
+1. as part of **site generation**, when the [Maven Site Plugin](/plugins/maven-site-plugin/) calls it through the
+   [Maven Reporting API](../maven-reporting-api/)'s
+   [`MavenReport`](../maven-reporting-api/apidocs/org/apache/maven/reporting/MavenReport.html) interface.
+2. as a **standalone goal**, for example `mvn myreport:report`, through the Maven Plugin API's
+   [`Mojo`](/ref/current/maven-plugin-api/apidocs/org/apache/maven/plugin/Mojo.html) interface. The report then
+   renders its own HTML page with the site skin from the project's `src/site/site.xml`, or, with
+   `-Doutput.format=<format>` such as `xdoc` or `apt`, writes the report in that Doxia format without a skin.
 
-2\. or as a direct standalone **goal invocation**, as a [maven-plugin-api](/ref/current/maven-plugin-api/)'s [`Mojo`](/ref/current/maven-plugin-api/apidocs/org/apache/maven/plugin/Mojo.html).
+Either way, `AbstractMavenReport` calls your `executeReport(Locale)` method, which writes the report through
+`getSink()`. Reports with several pages create a sink for each extra page with `getSinkFactory()`.
 
-The two APIs implementations are provided by [`AbstractMavenReport`](./apidocs/org/apache/maven/reporting/AbstractMavenReport.html), that delegates to extender's `executeReport( Locale )` reporting method implementation.
+The [guide to developing a report plugin](/guides/plugin/guide-java-report-plugin-development.html) walks through a
+complete example. The integration tests in this repository hold a working report plugin:
+[`src/it/setup-reporting-plugin`](https://github.com/apache/maven-reporting-impl/tree/${project.scm.tag}/src/it/setup-reporting-plugin).
 
-Notice that Doxia version used at runtime varies between **site generation** and **goal invocation**:
+${esc.h}${esc.h} Which Doxia version runs
 
-1\. when used as report during **site generation**, `maven-site-plugin` provides Doxia implementation to the plugin, overriding normal plugin dependency: see [DefaultMavenReportExecutor](/shared/maven-reporting-exec/xref/org/apache/maven/reporting/exec/DefaultMavenReportExecutor.html) in [`maven-reporting-exec`](/shared/maven-reporting-exec/).
+The Doxia version used at runtime differs between the two modes:
 
-2\. when used as a direct standalone **goal invocation**, Doxia implementation used is the version used during plugin compilation and kept as transitive dependency of the plugin.
+1. During **site generation**, the Maven Site Plugin provides Doxia and the Reporting API to the report, overriding
+   the plugin's own dependencies; see
+   [`DefaultMavenReportExecutor`](/shared/maven-reporting-exec/apidocs/org/apache/maven/reporting/exec/DefaultMavenReportExecutor.html)
+   in [Maven Reporting Exec](/shared/maven-reporting-exec/).
+2. As a **standalone goal**, the report uses the Doxia version it depends on, which comes in transitively through
+   this library.
 
-Usage
------
+Code a report against the oldest Maven Site Plugin you support; the
+[Reporting API compatibility notes](../maven-reporting-api/index.html${esc.hash}Compatibility_notes_for_report_authors)
+list the current pitfalls.
 
-A full working sample is included in `maven-reporting-impl` ITs, which are part of [the component source tree](../scm.html): see [`src/it/setup-reporting-plugin`](https://github.com/apache/maven-reporting-impl/tree/${project.scm.tag}/src/it/setup-reporting-plugin).
+${esc.h}${esc.h} Upgrading to 4.1.0
 
-History
--------
+Version 4.1.0 builds on Reporting API 4.1.0, Doxia 2.2.0 and Doxia Sitetools 2.1.0. Recompile your report against
+it; two changes can affect subclasses:
 
-|release date|maven-maven-reporting-impl|[Doxia](/doxia/)|
+- The protected field `siteRenderer` and the method `getSiteRenderer()` now use the type `SiteRenderer` instead of the
+  deprecated `Renderer`. An override that returns the field must declare `SiteRenderer` as its return type.
+- A new parameter, `mavenSession`, holds the Maven session. The site descriptor of a standalone report is now
+  interpolated with user and system properties too, as the Maven Site Plugin already does.
+
+Multi-page reports keep working with Maven Site Plugin 3.22.0 and older: `AbstractMavenReport` still implements the
+deprecated `MavenMultiPageReport` interface, which those versions require.
+
+${esc.h}${esc.h} History
+
+|Release date|maven-reporting-impl|[Doxia](/doxia/)|
 |:---:|:---:|:---:|
 |2024-10|4.0.0|**2.0.0**|
 |2022-08|[3.2.0](/shared-archives/maven-reporting-impl-3.2.0/)|1.11.1|
 |2022-02|[3.1.0](/shared-archives/maven-reporting-impl-3.1.0/)|1.11.1|
 |2017-06|[3.0.0](/shared-archives/maven-reporting-impl-3.0.0/)|1.7|
 
-See also Maven Site Plugin's [history](/plugins/maven-site-plugin/history.html#maven-site-plugin-vs-doxia-vs-doxia-sitetools).
-
-#[[### Upgrading to `maven-reporting-impl 2.3+`]]#
-
-When upgrading a reporting plugin from an old version of `maven-reporting-impl` to version 2.3 or more, a lot of copy/pasted code can be removed by upgrading the plugin to [plugin-tools with Java 5 annotations](/plugin-tools/maven-plugin-tools-annotations/): see [MSHARED-347](https://issues.apache.org/jira/browse/MSHARED-347) for more details.
-
+See also the Maven Site Plugin's [history](/plugins/maven-site-plugin/history.html#maven-site-plugin-vs-doxia-vs-doxia-sitetools).
