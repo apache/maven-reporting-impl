@@ -36,7 +36,8 @@ plugins. A report that extends it runs in two ways:
 2. as a **standalone goal**, for example `mvn myreport:report`, through the Maven Plugin API's
    [`Mojo`](/ref/current/maven-plugin-api/apidocs/org/apache/maven/plugin/Mojo.html) interface. The report then
    renders its own HTML page with the site skin from the project's `src/site/site.xml`, or, with
-   `-Doutput.format=<format>` such as `xdoc` or `apt`, writes the report in that Doxia format without a skin.
+   `-Doutput.format=<format>`, one of `markdown`, `xdoc`, `apt` or `xhtml`, writes the report in that Doxia format
+   without a skin.
 
 Either way, `AbstractMavenReport` calls your `executeReport(Locale)` method, which writes the report through
 `getSink()`. Reports with several pages create a sink for each extra page with `getSinkFactory()`.
