@@ -37,10 +37,12 @@ its own page with the site skin, or writes it in a Doxia markup format with `-Do
 mvn verify
 ```
 
-The integration tests under `src/it` build a sample report plugin and run it both ways:
+The integration tests under `src/it` build a sample report plugin and run it both ways.
+They are bound to the `verify` phase, so the `mvn verify` command above runs all of them.
+To run just one, select it by its directory name:
 
 ```shell
-mvn -P run-its verify
+mvn verify -Dinvoker.test=use-as-direct-mojo
 ```
 
 ## Contributing
