@@ -47,7 +47,6 @@ mvn verify -Dinvoker.test=use-as-direct-mojo
 
 ## Contributing
 
-Send pull requests against `master`; discuss larger changes on the
-[developer mailing list](https://maven.apache.org/mailing-lists.html) first. Spotless enforces the
-[Maven code style](https://maven.apache.org/developers/conventions/code.html) during the build; run
-`mvn spotless:apply` before you push. Pull request titles become entries in the release notes.
+Send pull requests against `master`; pull request titles become entries in the release notes.
+For code style, mailing lists and the rest of the process, see the
+[shared Maven contributor guide](https://maven.apache.org/developers/).
