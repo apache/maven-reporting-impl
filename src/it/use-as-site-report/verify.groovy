@@ -17,32 +17,32 @@
  * under the License.
  */
 
-File site = new File( basedir, 'target/site/' )
+File site = new File(basedir, 'target/site/')
 
-File f = new File( site, 'custom-report.html' );
-assert f.exists();
-assert f.text.contains( 'Custom Maven Report content.' );
+File f = new File(site, 'custom-report.html')
+assert f.exists()
+assert f.text.contains('Custom Maven Report content.')
 
-f = new File( site, 'custom-report-with-renderer.html' );
-assert f.exists();
-text = f.text.normalize();
-assert text.contains( 'Custom Maven Report with Renderer content.' );
-assert text.contains( '<pre>Custom verbatim text.</pre>' );
-assert text.contains( '<pre class="prettyprint"><code>var custom_code = true;</code></pre>' );
+f = new File(site, 'custom-report-with-renderer.html')
+assert f.exists()
+text = f.text.normalize()
+assert text.contains('Custom Maven Report with Renderer content.')
+assert text.contains('<pre>Custom verbatim text.</pre>')
+assert text.contains('<pre class="prettyprint"><code>var custom_code = true;</code></pre>')
 
-f = new File( site, 'external/report.html' );
-assert f.exists();
-assert f.text.contains( '<h1>External Report</h1>' );
+f = new File(site, 'external/report.html')
+assert f.exists()
+assert f.text.contains('<h1>External Report</h1>')
 
-f = new File( site, 'multi-page.html' );
-assert f.exists();
-assert f.text.contains( 'Custom Maven Report with Renderer content.' );
+f = new File(site, 'multi-page.html')
+assert f.exists()
+assert f.text.contains('Custom Maven Report with Renderer content.')
 
-f = new File( site, 'multi-second.html' );
-assert f.exists();
-text = f.text.normalize();
-assert text.contains( '<title>Second Page Title' );
-assert text.contains( 'Second page content.' );
-assert !text.contains( 'Custom Maven Report with Renderer content.' );
+f = new File(site, 'multi-second.html')
+assert f.exists()
+text = f.text.normalize()
+assert text.contains('<title>Second Page Title')
+assert text.contains('Second page content.')
+assert !text.contains('Custom Maven Report with Renderer content.')
 
-return true;
+return true

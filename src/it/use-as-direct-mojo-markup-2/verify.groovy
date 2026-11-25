@@ -17,18 +17,18 @@
  * under the License.
  */
 
-File outputDir = new File( basedir, 'target/custom-reports/' )
+File outputDir = new File(basedir, 'target/custom-reports/')
 
-File f = new File( outputDir, 'custom-report.xdoc' );
-assert f.exists();
-assert f.text.contains( 'Custom Maven Report content.' );
+File f = new File(outputDir, 'custom-report.xdoc')
+assert f.exists()
+assert f.text.contains('Custom Maven Report content.')
 
-f = new File( outputDir, 'custom-report-with-renderer.apt' );
-assert f.exists();
-assert f.text.contains( 'Custom Maven Report with Renderer content.' );
+f = new File(outputDir, 'custom-report-with-renderer.apt')
+assert f.exists()
+assert f.text.contains('Custom Maven Report with Renderer content.')
 
-f = new File( outputDir, 'external/report.html' );
-assert f.exists();
-assert f.text.contains( '<h1>External Report</h1>' );
+f = new File(outputDir, 'external/report.html')
+assert f.exists()
+assert f.text.contains('<h1>External Report</h1>')
 
-return true;
+return true

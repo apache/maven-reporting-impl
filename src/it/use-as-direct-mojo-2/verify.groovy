@@ -17,21 +17,21 @@
  * under the License.
  */
 
-File outputDir = new File( basedir, 'target/custom-reports/' )
+File outputDir = new File(basedir, 'target/custom-reports/')
 
-File f = new File( outputDir, 'custom-report.html' );
-assert f.exists();
-assert f.text.contains( 'Custom Maven Report content.' );
+File f = new File(outputDir, 'custom-report.html')
+assert f.exists()
+assert f.text.contains('Custom Maven Report content.')
 
-f = new File( outputDir, 'custom-report-with-renderer.html' );
-assert f.exists();
-text = f.text.normalize();
-assert text.contains( 'Custom Maven Report with Renderer content.' );
-assert text.contains( '<pre>Custom verbatim text.</pre>' );
-assert text.contains( '<pre class="prettyprint"><code>var custom_code = true;</code></pre>' );
+f = new File(outputDir, 'custom-report-with-renderer.html')
+assert f.exists()
+text = f.text.normalize()
+assert text.contains('Custom Maven Report with Renderer content.')
+assert text.contains('<pre>Custom verbatim text.</pre>')
+assert text.contains('<pre class="prettyprint"><code>var custom_code = true;</code></pre>')
 
-f = new File( outputDir, 'external/report.html' );
-assert f.exists();
-assert f.text.contains( '<h1>External Report</h1>' );
+f = new File(outputDir, 'external/report.html')
+assert f.exists()
+assert f.text.contains('<h1>External Report</h1>')
 
-return true;
+return true
