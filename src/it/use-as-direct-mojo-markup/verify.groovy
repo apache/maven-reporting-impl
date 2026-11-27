@@ -27,6 +27,13 @@ f = new File( outputDir, 'custom-report-with-renderer.apt' );
 assert f.exists();
 assert f.text.contains( 'Custom Maven Report with Renderer content.' );
 
+f = new File( outputDir, 'custom-report-with-renderer.markdown' );
+assert f.exists();
+text = f.text.normalize();
+assert text.contains( '\n# section\n' );
+assert text.contains( 'Custom Maven Report with Renderer content.' );
+assert !text.contains( '<html' );
+
 f = new File( outputDir, 'external/report.html' );
 assert f.exists();
 assert f.text.contains( '<h1>External Report</h1>' );
